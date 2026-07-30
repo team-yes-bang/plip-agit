@@ -18,4 +18,16 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/test/ping:
+    get:
+      tags:
+      - test-controller
+      operationId: ping
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
 components: {}

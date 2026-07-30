@@ -13,4 +13,10 @@ public class TestController {
         log.info("log@@");
         return "test success!";
     }
+
+    @GetMapping("/api/test/ping")
+    public String ping() {
+        log.info("ping@@");
+        return "pong";
+    }
 }
