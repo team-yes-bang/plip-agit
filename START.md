@@ -2,13 +2,15 @@
 
 이 문서는 `template` 레포지토리를 복사한 직후 **이름·패키지·YML·env·Swagger 타이틀·로컬 기동**만 다룹니다.
 
-| 문서 | 역할 |
-| --- | --- |
-| **START.md** (본 문서) | 템플릿 적용 직후 초기 설정 |
-| [DOCKER_SETUP.md](DOCKER_SETUP.md) | 로컬 **앱+MySQL Docker Compose** 기동 |
-| [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md) | 팀원용 전체 개발 규칙 (헥사고날, DB, OpenAPI, 샘플 참고) |
-| [AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md) | AI 에이전트용 코드 생성 제약 |
-| [GIT_CONVENTION.md](GIT_CONVENTION.md) | Issue / 브랜치 / 커밋 / PR / CI |
+
+| 문서                                                 | 역할                                      |
+| -------------------------------------------------- | --------------------------------------- |
+| **START.md** (본 문서)                                | 템플릿 적용 직후 초기 설정                         |
+| [DOCKER_SETUP.md](DOCKER_SETUP.md)                 | 로컬 **앱+MySQL Docker Compose** 기동        |
+| [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)       | 팀원용 전체 개발 규칙 (헥사고날, DB, OpenAPI, 샘플 참고) |
+| [AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md) | AI 에이전트용 코드 생성 제약                       |
+| [GIT_CONVENTION.md](GIT_CONVENTION.md)             | Issue / 브랜치 / 커밋 / PR / CI              |
+
 
 초기 설정이 끝나면 이후 개발은 DEVELOPMENT_GUIDE를 따릅니다. (`src/test/java/com/sample`은 빌드되지 않는 구조 참고용입니다. 명명은 샘플의 `adaptor`/`vo`가 아니라 DEVELOPMENT_GUIDE 표준 `adapter`/`dto`/`persistence`를 사용하세요.)
 
@@ -21,6 +23,8 @@
 - [ ] 5. 로컬 실행 확인 ([DOCKER_SETUP.md](DOCKER_SETUP.md) 권장: `docker compose up -d --build`)
 
 ---
+
+
 
 ## ⚠️ 샘플 코드 (`com.sample`) — 참고용 (빌드 제외)
 
@@ -58,8 +62,8 @@ sourceSets {
 // ❌ 변경 전
 rootProject.name = 'template'
 
-// ⭕ 변경 후 (예시: agit-service / user-service / media-service)
-rootProject.name = 'agit-service'
+// ⭕ 변경 후 (예시: agit / user / media)
+rootProject.name = 'agit'
 
 ```
 
@@ -95,12 +99,12 @@ version = '0.0.1-SNAPSHOT'
 설정은 **공통 / 프로필 / 시크릿**으로 나눕니다.
 
 
-| 파일 | 역할 |
-| --- | --- |
-| `application.yaml` | 모든 환경 공통 (앱 이름, driver, DB 계정 env 키, Eureka instance 등) |
-| `application-local.yml` | `local` 프로필 — 호스트 IDE/`bootRun` (포트, localhost DB, Eureka) |
-| `application-docker.yml` | `docker` 프로필 — Compose 앱 컨테이너 (DB 호스트=`mysql`) |
-| `.env` (또는 IDE/OS 환경변수) | `DB_USERNAME`, `DB_PASSWORD`, (충돌 시) `SERVER_PORT` — **Git 커밋 금지** |
+| 파일                       | 역할                                                                 |
+| ------------------------ | ------------------------------------------------------------------ |
+| `application.yaml`       | 모든 환경 공통 (앱 이름, driver, DB 계정 env 키, Eureka instance 등)            |
+| `application-local.yml`  | `local` 프로필 — 호스트 IDE/`bootRun` (포트, localhost DB, Eureka)         |
+| `application-docker.yml` | `docker` 프로필 — Compose 앱 컨테이너 (DB 호스트=`mysql`)                     |
+| `.env` (또는 IDE/OS 환경변수)  | `DB_USERNAME`, `DB_PASSWORD`, (충돌 시) `SERVER_PORT` — **Git 커밋 금지** |
 
 
 > 값이 환경마다 같으면 `application.yaml`에만 두고, `-local` 등에 다시 적지 않습니다.  
@@ -262,7 +266,7 @@ public class SwaggerConfig {
 ./gradlew test
 ```
 
-2. **결과 확인:** `docs/openapi.yaml`이 정상 생성/갱신되었는지 확인 후 Git에 커밋합니다.
+1. **결과 확인:** `docs/openapi.yaml`이 정상 생성/갱신되었는지 확인 후 Git에 커밋합니다.
 
 ---
 
@@ -278,6 +282,8 @@ public class SwaggerConfig {
 2. `docker compose up -d --build`
 3. Swagger: `http://localhost:{SERVER_PORT}/swagger-ui/index.html`
 4. API 호출로 `200 OK` 확인
+
+
 
 ### B) 호스트 직접 실행 (IDE / bootRun)
 
