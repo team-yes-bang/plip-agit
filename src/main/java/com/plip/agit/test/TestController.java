@@ -1,4 +1,4 @@
-package com.plip.template.test;
+package com.plip.agit.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
