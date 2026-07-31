@@ -1,5 +1,5 @@
 name: Docs
-description: 가이드·OpenAPI 설명·SQL/이벤트 문서 등을 수정합니다.
+description: 가이드·SQL/이벤트 문서 등을 수정합니다.
 title: "[Docs] "
 labels:
   - Docs
@@ -9,7 +9,6 @@ body:
     attributes:
       value: |
         유형·제목·PR 규칙은 레포 루트 `GIT_CONVENTION.md`를 참고하세요.
-        Controller 구현으로 스펙만 바뀌는 경우 Feature/Fix PR에서 `docs/openapi.yaml`을 함께 커밋하면 됩니다.
 
   - type: textarea
     id: description

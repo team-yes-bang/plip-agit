@@ -1,4 +1,4 @@
-package com.plip.template.test;
+package com.plip.agit.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,5 +12,11 @@ public class TestController {
     public String test() {
         log.info("log@@");
         return "test success!";
+    }
+
+    @GetMapping("/api/test/ping")
+    public String ping() {
+        log.info("ping@@");
+        return "pong";
     }
 }
