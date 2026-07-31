@@ -32,7 +32,7 @@ GitHub **New Issue**에서 템플릿을 선택합니다.
 | Fix | `[Fix] ` | `Fix` | 버그 수정 |
 | Refactor | `[Refactor] ` | `Refactor` | 동작 동일, 구조·가독성 개선 |
 | Style | `[Style] ` | `Style` | 포맷·네이밍 등 동작 없는 스타일 정리 |
-| Docs | `[Docs] ` | `Docs` | START / DEVELOPMENT_GUIDE / OpenAPI 설명 등 문서 |
+| Docs | `[Docs] ` | `Docs` | START / DEVELOPMENT_GUIDE 등 문서 |
 | Chore | `[Chore] ` | `Chore` | 빌드·CI·의존성·설정 |
 
 ### 작성 요령
@@ -81,7 +81,6 @@ Chore: test 프로필 H2 추가
 ```
 
 - `{Type}`: `Feature` | `Fix` | `Refactor` | `Style` | `Docs` | `Chore`
-- API 변경 후 `./gradlew test`로 `docs/openapi.yaml`이 바뀌면 **함께 커밋**합니다.
 - DDL 변경 시 `docs/sql/schema.sql`도 함께 커밋합니다.
 
 ---
@@ -133,7 +132,6 @@ PR 템플릿 섹션을 모두 채웁니다.
 - [ ] 제목·Type·이슈 번호 일치
 - [ ] `Close #N` 연결
 - [ ] CI `Test` 성공
-- [ ] API 변경 시 `docs/openapi.yaml` 포함
 - [ ] DDL 변경 시 `docs/sql/schema.sql` 포함
 
 ---
@@ -145,6 +143,8 @@ PR 템플릿 섹션을 모두 채웁니다.
 - 트리거: `develop` / `main`에 대한 `pull_request`, `push`
 - 실행: JDK 17 + `./gradlew test --no-daemon` (레포 루트)
 - push 전 로컬에서도 `./gradlew test`로 확인합니다.
+
+**API 명세:** [Gateway Swagger UI](http://192.168.10.144:8000/swagger-ui/index.html)에서 서비스별 OpenAPI를 통합 조회합니다. repo `docs/openapi.yaml` 커밋은 필수가 아닙니다.
 
 ---
 
@@ -165,7 +165,7 @@ PR 템플릿 섹션을 모두 채웁니다.
 | 문서 | 역할 |
 | --- | --- |
 | [START.md](START.md) | 템플릿 초기 설정 |
-| [DOCKER_SETUP.md](DOCKER_SETUP.md) | 로컬 Docker(앱+MySQL) |
-| [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md) | 개발 아키텍처·DB·OpenAPI |
+| [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md) | 개발 아키텍처·DB |
+| [DEVELOP_PC_DEPLOY.md](../plip-develop-env/DEVELOP_PC_DEPLOY.md) | Develop PC deploy · Gateway 통합 API 문서 |
 | [AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md) | AI 코드 생성 규칙 |
 | **GIT_CONVENTION.md** | Issue / 브랜치 / 커밋 / PR / CI |

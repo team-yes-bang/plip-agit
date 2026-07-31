@@ -3,7 +3,6 @@
 이 문서는 PLIP 마이크로서비스 개발 시 팀원이 따라야 하는 공통 아키텍처·개발 규칙입니다.
 
 - 템플릿 복사 **직후** 이름·포트·env 설정 → [START.md](START.md)
-- 로컬 **Docker(앱+MySQL)** 기동 → [DOCKER_SETUP.md](DOCKER_SETUP.md)
 - **AI 에이전트**용 코드 규칙 → [AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md)
   - 필요시 수정 및 추가하거나 사용하는 Agent IDE에 workspace rules로 추가해 사용하세요
 
@@ -73,9 +72,9 @@ src/main/java/com/plip/{service}/
 
 ### 3.1 REST (Springdoc OpenAPI)
 
-- Springdoc 기반 **코드 퍼스트**입니다. Controller·DTO에 `@Tag`, `@Operation`, `@Schema`를 붙입니다.
-- `./gradlew test` 실행 시 자동으로 `OpenApiGeneratorTest`가 `docs/openapi.yaml`을 갱신합니다.
-- API가 바뀌면 `docs/openapi.yaml`을 **함께 커밋**합니다.
+- Springdoc **코드 퍼스트**: Controller·DTO에 `@Tag`, `@Operation`, `@Schema`를 붙입니다.
+- `./gradlew test` 시 `OpenApiGeneratorTest`가 CI에서 함께 실행됩니다 (H2 `test` 프로필).
+- **API 명세 조회**: [Gateway Swagger UI](http://192.168.10.144:8000/swagger-ui/index.html) (서비스별 통합). repo `docs/openapi.yaml` 커밋은 **필수 아님** ([GIT_CONVENTION.md](GIT_CONVENTION.md)).
 
 
 

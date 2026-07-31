@@ -27,8 +27,7 @@ body:
       value: |
         - [ ] UseCase / Service 구현
         - [ ] Adapter (web / persistence) 구현
-        - [ ] 테스트
-        - [ ] docs/openapi.yaml 갱신 (`./gradlew test`)
+        - [ ] 테스트 (`./gradlew test`)
     validations:
       required: true
 
@@ -39,7 +38,7 @@ body:
       description: 이 이슈를 닫을 수 있는 조건입니다.
       placeholder: |
         - POST /api/v1/... 가 201을 반환한다
-        - Swagger에 엔드포인트가 노출된다
+        - Develop PC Gateway Swagger에서 엔드포인트 확인 (http://192.168.10.144:8000/swagger-ui/index.html)
     validations:
       required: false
 
