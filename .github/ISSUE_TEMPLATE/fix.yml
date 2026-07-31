@@ -46,7 +46,6 @@ body:
       value: |
         - [ ] 원인 수정
         - [ ] 회귀 테스트
-        - [ ] (API 변경 시) docs/openapi.yaml 갱신
     validations:
       required: true
 
