@@ -5,7 +5,30 @@ info:
 servers:
 - url: http://localhost
   description: Generated server url
+tags:
+- name: Agit
+  description: 아지트 API
 paths:
+  /api/v1/agits:
+    post:
+      tags:
+      - Agit
+      summary: 아지트 생성
+      description: 아지트를 생성하고 초대 코드를 발급합니다.
+      operationId: createAgit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAgitRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateAgitResponse"
   /api/test:
     get:
       tags:
@@ -30,4 +53,48 @@ paths:
             '*/*':
               schema:
                 type: string
-components: {}
+components:
+  schemas:
+    CreateAgitRequest:
+      type: object
+      description: 아지트 생성 요청
+      properties:
+        agitName:
+          type: string
+          description: "아지트 제목 (필수, 최대 20자)"
+          example: 주말 보드게임
+        description:
+          type: string
+          description: "소개글 (선택, 최대 100자)"
+          example: 가볍게 즐겨요
+        maximumCapacity:
+          type: integer
+          format: int32
+          description: "최대 인원 (필수, 기본 허용 상한 5)"
+          example: 5
+    CreateAgitResponse:
+      type: object
+      description: 아지트 생성 응답
+      properties:
+        agitUuid:
+          type: string
+          format: uuid
+          description: 아지트 UUID
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        agitName:
+          type: string
+          description: 아지트 제목
+          example: 주말 보드게임
+        description:
+          type: string
+          description: 소개글
+          example: 가볍게 즐겨요
+        maximumCapacity:
+          type: integer
+          format: int32
+          description: 최대 인원
+          example: 5
+        code:
+          type: string
+          description: 초대 코드
+          example: AB12CD
