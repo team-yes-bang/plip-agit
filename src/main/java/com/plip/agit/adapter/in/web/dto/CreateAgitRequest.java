@@ -17,4 +17,7 @@ public class CreateAgitRequest {
 
 	@Schema(description = "최대 인원 (필수, 기본 허용 상한 5)", example = "5")
 	private Integer maximumCapacity;
+
+	@Schema(description = "섬네일 경로 (선택, 최대 255자)", example = "agits/thumbnails/sample.png")
+	private String thumbnailPath;
 }

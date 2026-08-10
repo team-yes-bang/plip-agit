@@ -9,6 +9,7 @@ CREATE TABLE agits (
     maximum_capacity   INT         NOT NULL,
     code               CHAR(6)     NOT NULL,
     status             VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' COMMENT 'ACTIVE, DELETED',
+    thumbnail_path     VARCHAR(255) NULL COMMENT '아지트 섬네일',
     created_at         DATETIME    NOT NULL,
     updated_at         DATETIME    NOT NULL,
     CONSTRAINT uk_agits_agit_uuid UNIQUE (agit_uuid),

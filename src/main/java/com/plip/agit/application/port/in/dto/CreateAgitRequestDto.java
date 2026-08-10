@@ -10,4 +10,5 @@ public class CreateAgitRequestDto {
 	private final String agitName;
 	private final String description;
 	private final Integer maximumCapacity;
+	private final String thumbnailPath;
 }

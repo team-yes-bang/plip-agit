@@ -24,4 +24,7 @@ public class CreateAgitResponse {
 
 	@Schema(description = "초대 코드", example = "AB12CD")
 	private String code;
+
+	@Schema(description = "섬네일 경로", example = "agits/thumbnails/sample.png")
+	private String thumbnailPath;
 }
