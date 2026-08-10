@@ -39,3 +39,7 @@ out/
 ### Local secrets ###
 .env
 application-*.yml
+
+### POSTMAN ###
+postman/
+.postman/
