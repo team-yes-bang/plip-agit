@@ -15,6 +15,9 @@ public class AgitWebMapper {
 				.description(request.getDescription())
 				.maximumCapacity(request.getMaximumCapacity())
 				.thumbnailPath(request.getThumbnailPath())
+				.userUuid(request.getUserUuid())
+				.nickname(request.getNickname())
+				.profileImagePath(request.getProfileImagePath())
 				.build();
 	}
 
@@ -26,6 +29,10 @@ public class AgitWebMapper {
 				.maximumCapacity(resultDto.getMaximumCapacity())
 				.code(resultDto.getCode())
 				.thumbnailPath(resultDto.getThumbnailPath())
+				.ampId(resultDto.getAmpId())
+				.nickname(resultDto.getNickname())
+				.profileImagePath(resultDto.getProfileImagePath())
+				.role(resultDto.getRole())
 				.build();
 	}
 }
