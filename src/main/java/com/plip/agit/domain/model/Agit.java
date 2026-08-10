@@ -20,6 +20,7 @@ public class Agit {
 
 	private static final Pattern CODE_PATTERN = Pattern.compile("^[A-Z0-9]{6}$");
 
+	private Long id;
 	private UUID agitUuid;
 	private String agitName;
 	private String description;
@@ -58,6 +59,7 @@ public class Agit {
 	}
 
 	public static Agit reconstitute(
+			Long id,
 			UUID agitUuid,
 			String agitName,
 			String description,
@@ -67,6 +69,7 @@ public class Agit {
 			String thumbnailPath
 	) {
 		return Agit.builder()
+				.id(id)
 				.agitUuid(agitUuid)
 				.agitName(agitName)
 				.description(description != null ? description : "")
@@ -158,6 +161,7 @@ public class Agit {
 
 	@Builder(access = AccessLevel.PRIVATE)
 	private Agit(
+			Long id,
 			UUID agitUuid,
 			String agitName,
 			String description,
@@ -166,6 +170,7 @@ public class Agit {
 			AgitStatus status,
 			String thumbnailPath
 	) {
+		this.id = id;
 		this.agitUuid = agitUuid;
 		this.agitName = agitName;
 		this.description = description;

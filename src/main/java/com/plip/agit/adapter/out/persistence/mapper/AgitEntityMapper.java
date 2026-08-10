@@ -22,6 +22,7 @@ public class AgitEntityMapper {
 
 	public Agit toDomain(AgitEntity entity) {
 		return Agit.reconstitute(
+				entity.getId(),
 				entity.getAgitUuid(),
 				entity.getAgitName(),
 				entity.getDescription(),
