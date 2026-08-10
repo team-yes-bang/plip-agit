@@ -29,6 +29,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CreateAgitResponse"
+  /api/v1/agits/codes/{code}:
+    get:
+      tags:
+      - Agit
+      summary: 아지트 랜딩 조회
+      description: 초대 코드로 ACTIVE 아지트의 랜딩 표시 정보를 조회합니다. 인증 없이 호출 가능합니다.
+      operationId: getLandingByCode
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AgitLandingResponse"
   /api/test:
     get:
       tags:
@@ -139,3 +159,33 @@ components:
           - HOST
           - GUEST
           example: HOST
+    AgitLandingResponse:
+      type: object
+      description: 아지트 랜딩 조회 응답 (표시 전용)
+      properties:
+        agitName:
+          type: string
+          description: 아지트 제목
+          example: 주말 보드게임
+        description:
+          type: string
+          description: 소개글
+          example: 가볍게 즐겨요
+        currentMemberCount:
+          type: integer
+          format: int64
+          description: 현재 인원 (ACTIVE 멤버 수)
+          example: 1
+        maximumCapacity:
+          type: integer
+          format: int32
+          description: 최대 인원
+          example: 5
+        hostNickname:
+          type: string
+          description: 아지트장 닉네임
+          example: 보드왕
+        thumbnailPath:
+          type: string
+          description: 섬네일 경로
+          example: agits/thumbnails/sample.png

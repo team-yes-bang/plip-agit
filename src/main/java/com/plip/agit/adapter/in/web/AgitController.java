@@ -1,15 +1,19 @@
 package com.plip.agit.adapter.in.web;
 
+import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
 import com.plip.agit.adapter.in.web.mapper.AgitWebMapper;
 import com.plip.agit.application.port.in.AgitUseCase;
+import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +40,15 @@ public class AgitController {
 		CreateAgitRequestDto requestDto = agitWebMapper.toDto(request);
 		CreateAgitResultDto resultDto = agitUseCase.createAgit(requestDto);
 		return agitWebMapper.toResponse(resultDto);
+	}
+
+	@Operation(
+			summary = "아지트 랜딩 조회",
+			description = "초대 코드로 ACTIVE 아지트의 랜딩 표시 정보를 조회합니다. 인증 없이 호출 가능합니다."
+	)
+	@GetMapping("/codes/{code}")
+	public AgitLandingResponse getLandingByCode(@PathVariable String code) {
+		AgitLandingResultDto resultDto = agitUseCase.getLandingByCode(code);
+		return agitWebMapper.toLandingResponse(resultDto);
 	}
 }

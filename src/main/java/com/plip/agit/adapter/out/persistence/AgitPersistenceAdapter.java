@@ -56,6 +56,12 @@ public class AgitPersistenceAdapter implements AgitPersistencePort {
 	}
 
 	@Override
+	public Optional<Agit> findActiveByCode(String code) {
+		return agitRepository.findByCodeAndStatus(code, AgitStatus.ACTIVE)
+				.map(agitEntityMapper::toDomain);
+	}
+
+	@Override
 	public boolean existsByCode(String code) {
 		return agitRepository.existsByCode(code);
 	}

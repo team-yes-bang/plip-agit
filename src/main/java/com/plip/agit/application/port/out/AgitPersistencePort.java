@@ -12,5 +12,7 @@ public interface AgitPersistencePort {
 
 	Optional<Agit> findByCode(String code);
 
+	Optional<Agit> findActiveByCode(String code);
+
 	boolean existsByCode(String code);
 }

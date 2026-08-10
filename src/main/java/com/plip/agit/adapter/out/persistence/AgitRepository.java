@@ -14,6 +14,8 @@ public interface AgitRepository extends JpaRepository<AgitEntity, Long> {
 
 	Optional<AgitEntity> findByCode(String code);
 
+	Optional<AgitEntity> findByCodeAndStatus(String code, AgitStatus status);
+
 	boolean existsByCode(String code);
 
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
