@@ -1,5 +1,6 @@
 package com.plip.agit.domain.model;
 
+import com.plip.agit.global.util.UuidV7;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.AccessLevel;
@@ -48,7 +49,7 @@ public class Agit {
 		String normalizedThumbnailPath = normalizeThumbnailPath(thumbnailPath);
 
 		return Agit.builder()
-				.agitUuid(UUID.randomUUID())
+				.agitUuid(UuidV7.generate())
 				.agitName(normalizedName)
 				.description(normalizedDescription)
 				.maximumCapacity(capacity)
