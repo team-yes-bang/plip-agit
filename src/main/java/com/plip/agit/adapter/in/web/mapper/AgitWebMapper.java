@@ -1,7 +1,9 @@
 package com.plip.agit.adapter.in.web.mapper;
 
+import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
+import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import org.springframework.stereotype.Component;
@@ -33,6 +35,17 @@ public class AgitWebMapper {
 				.nickname(resultDto.getNickname())
 				.profileImagePath(resultDto.getProfileImagePath())
 				.role(resultDto.getRole())
+				.build();
+	}
+
+	public AgitLandingResponse toLandingResponse(AgitLandingResultDto resultDto) {
+		return AgitLandingResponse.builder()
+				.agitName(resultDto.getAgitName())
+				.description(resultDto.getDescription())
+				.currentMemberCount(resultDto.getCurrentMemberCount())
+				.maximumCapacity(resultDto.getMaximumCapacity())
+				.hostNickname(resultDto.getHostNickname())
+				.thumbnailPath(resultDto.getThumbnailPath())
 				.build();
 	}
 }
