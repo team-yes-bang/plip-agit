@@ -24,6 +24,7 @@ public interface AgitRepository extends JpaRepository<AgitEntity, Long> {
 			       a.maximumCapacity = :maximumCapacity,
 			       a.code = :code,
 			       a.status = :status,
+			       a.thumbnailPath = :thumbnailPath,
 			       a.updatedAt = :updatedAt
 			 WHERE a.agitUuid = :agitUuid
 			""")
@@ -34,6 +35,7 @@ public interface AgitRepository extends JpaRepository<AgitEntity, Long> {
 			@Param("maximumCapacity") Integer maximumCapacity,
 			@Param("code") String code,
 			@Param("status") AgitStatus status,
+			@Param("thumbnailPath") String thumbnailPath,
 			@Param("updatedAt") LocalDateTime updatedAt
 	);
 }

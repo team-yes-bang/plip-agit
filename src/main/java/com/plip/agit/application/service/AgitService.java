@@ -32,6 +32,7 @@ public class AgitService implements AgitUseCase {
 				requestDto.getDescription(),
 				requestDto.getMaximumCapacity(),
 				code,
+				requestDto.getThumbnailPath(),
 				allowedMaxCapacity
 		);
 
@@ -43,6 +44,7 @@ public class AgitService implements AgitUseCase {
 				.description(saved.getDescription())
 				.maximumCapacity(saved.getMaximumCapacity())
 				.code(saved.getCode())
+				.thumbnailPath(saved.getThumbnailPath())
 				.build();
 	}
 

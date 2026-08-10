@@ -13,4 +13,5 @@ public class CreateAgitResultDto {
 	private final String description;
 	private final int maximumCapacity;
 	private final String code;
+	private final String thumbnailPath;
 }

@@ -34,6 +34,7 @@ public class AgitPersistenceAdapter implements AgitPersistencePort {
 				agit.getMaximumCapacity(),
 				agit.getCode(),
 				agitEntityMapper.toEntityStatus(agit.getStatus()),
+				agit.getThumbnailPath(),
 				LocalDateTime.now()
 		);
 

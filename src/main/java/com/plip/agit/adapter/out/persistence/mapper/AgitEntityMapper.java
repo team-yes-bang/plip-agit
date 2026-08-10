@@ -16,6 +16,7 @@ public class AgitEntityMapper {
 				.maximumCapacity(domain.getMaximumCapacity())
 				.code(domain.getCode())
 				.status(toEntityStatus(domain.getStatus()))
+				.thumbnailPath(domain.getThumbnailPath())
 				.build();
 	}
 
@@ -26,7 +27,8 @@ public class AgitEntityMapper {
 				entity.getDescription(),
 				entity.getMaximumCapacity(),
 				entity.getCode(),
-				toDomainStatus(entity.getStatus())
+				toDomainStatus(entity.getStatus()),
+				entity.getThumbnailPath()
 		);
 	}
 

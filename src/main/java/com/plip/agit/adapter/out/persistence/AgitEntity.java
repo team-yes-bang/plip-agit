@@ -46,6 +46,9 @@ public class AgitEntity extends BaseEntity {
 	@Column(name = "status", nullable = false, length = 20)
 	private AgitStatus status;
 
+	@Column(name = "thumbnail_path", length = 255)
+	private String thumbnailPath;
+
 	@Builder
 	private AgitEntity(
 			UUID agitUuid,
@@ -53,7 +56,8 @@ public class AgitEntity extends BaseEntity {
 			String description,
 			Integer maximumCapacity,
 			String code,
-			AgitStatus status
+			AgitStatus status,
+			String thumbnailPath
 	) {
 		this.agitUuid = agitUuid;
 		this.agitName = agitName;
@@ -61,5 +65,6 @@ public class AgitEntity extends BaseEntity {
 		this.maximumCapacity = maximumCapacity;
 		this.code = code;
 		this.status = status != null ? status : AgitStatus.ACTIVE;
+		this.thumbnailPath = thumbnailPath;
 	}
 }

@@ -13,6 +13,7 @@ public class Agit {
 
 	public static final int NAME_MAX_LENGTH = 20;
 	public static final int DESCRIPTION_MAX_LENGTH = 100;
+	public static final int THUMBNAIL_PATH_MAX_LENGTH = 255;
 	public static final int DEFAULT_MAX_CAPACITY = 5;
 	public static final int ABSOLUTE_MAX_CAPACITY = 20;
 	public static final int CODE_LENGTH = 6;
@@ -25,6 +26,7 @@ public class Agit {
 	private int maximumCapacity;
 	private String code;
 	private AgitStatus status;
+	private String thumbnailPath;
 
 	/**
 	 * @param allowedMaxCapacity 아이템 보유 여부 등을 유스케이스에서 판정한 뒤 넘기는 허용 최대 인원
@@ -35,12 +37,14 @@ public class Agit {
 			String description,
 			Integer maximumCapacity,
 			String code,
+			String thumbnailPath,
 			int allowedMaxCapacity
 	) {
 		String normalizedName = requireName(agitName);
 		String normalizedDescription = normalizeDescription(description);
 		int capacity = requireCapacity(maximumCapacity, allowedMaxCapacity);
 		String normalizedCode = requireCode(code);
+		String normalizedThumbnailPath = normalizeThumbnailPath(thumbnailPath);
 
 		return Agit.builder()
 				.agitUuid(UUID.randomUUID())
@@ -49,6 +53,7 @@ public class Agit {
 				.maximumCapacity(capacity)
 				.code(normalizedCode)
 				.status(AgitStatus.ACTIVE)
+				.thumbnailPath(normalizedThumbnailPath)
 				.build();
 	}
 
@@ -58,7 +63,8 @@ public class Agit {
 			String description,
 			int maximumCapacity,
 			String code,
-			AgitStatus status
+			AgitStatus status,
+			String thumbnailPath
 	) {
 		return Agit.builder()
 				.agitUuid(agitUuid)
@@ -67,6 +73,7 @@ public class Agit {
 				.maximumCapacity(maximumCapacity)
 				.code(code)
 				.status(status != null ? status : AgitStatus.ACTIVE)
+				.thumbnailPath(thumbnailPath)
 				.build();
 	}
 
@@ -136,6 +143,19 @@ public class Agit {
 		return normalized;
 	}
 
+	private static String normalizeThumbnailPath(String thumbnailPath) {
+		if (thumbnailPath == null || thumbnailPath.isBlank()) {
+			return null;
+		}
+		String trimmed = thumbnailPath.trim();
+		if (trimmed.length() > THUMBNAIL_PATH_MAX_LENGTH) {
+			throw new IllegalArgumentException(
+					"섬네일 경로는 " + THUMBNAIL_PATH_MAX_LENGTH + "자 이하여야 합니다."
+			);
+		}
+		return trimmed;
+	}
+
 	@Builder(access = AccessLevel.PRIVATE)
 	private Agit(
 			UUID agitUuid,
@@ -143,7 +163,8 @@ public class Agit {
 			String description,
 			int maximumCapacity,
 			String code,
-			AgitStatus status
+			AgitStatus status,
+			String thumbnailPath
 	) {
 		this.agitUuid = agitUuid;
 		this.agitName = agitName;
@@ -151,5 +172,6 @@ public class Agit {
 		this.maximumCapacity = maximumCapacity;
 		this.code = code;
 		this.status = status;
+		this.thumbnailPath = thumbnailPath;
 	}
 }
