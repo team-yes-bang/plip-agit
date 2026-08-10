@@ -9,4 +9,12 @@ public interface AgitMemberProfileRepository extends JpaRepository<AgitMemberPro
 	Optional<AgitMemberProfileEntity> findByAgitIdAndUserUuid(Long agitId, UUID userUuid);
 
 	boolean existsByAgitIdAndUserUuid(Long agitId, UUID userUuid);
+
+	Optional<AgitMemberProfileEntity> findByAgitIdAndRoleAndStatus(
+			Long agitId,
+			AgitMemberRole role,
+			AgitMemberStatus status
+	);
+
+	long countByAgitIdAndStatus(Long agitId, AgitMemberStatus status);
 }
