@@ -3,8 +3,10 @@ package com.plip.agit.application.service;
 import com.plip.agit.application.port.in.AgitUseCase;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
+import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
 import com.plip.agit.domain.model.Agit;
+import com.plip.agit.domain.model.AgitMemberProfile;
 import java.security.SecureRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,16 @@ public class AgitService implements AgitUseCase {
 	private static final int CODE_GENERATE_MAX_ATTEMPTS = 10;
 
 	private final AgitPersistencePort agitPersistencePort;
+	private final AgitMemberProfilePersistencePort agitMemberProfilePersistencePort;
 	private final SecureRandom secureRandom = new SecureRandom();
 
 	@Override
 	@Transactional
 	public CreateAgitResultDto createAgit(CreateAgitRequestDto requestDto) {
+		if (requestDto.getUserUuid() == null) {
+			throw new IllegalArgumentException("사용자 UUID는 필수입니다.");
+		}
+
 		String code = generateUniqueCode();
 		int allowedMaxCapacity = resolveAllowedMaxCapacity();
 
@@ -36,15 +43,27 @@ public class AgitService implements AgitUseCase {
 				allowedMaxCapacity
 		);
 
-		Agit saved = agitPersistencePort.save(agit);
+		Agit savedAgit = agitPersistencePort.save(agit);
+
+		AgitMemberProfile hostProfile = AgitMemberProfile.createHost(
+				savedAgit.getId(),
+				requestDto.getUserUuid(),
+				requestDto.getNickname(),
+				requestDto.getProfileImagePath()
+		);
+		AgitMemberProfile savedProfile = agitMemberProfilePersistencePort.save(hostProfile);
 
 		return CreateAgitResultDto.builder()
-				.agitUuid(saved.getAgitUuid())
-				.agitName(saved.getAgitName())
-				.description(saved.getDescription())
-				.maximumCapacity(saved.getMaximumCapacity())
-				.code(saved.getCode())
-				.thumbnailPath(saved.getThumbnailPath())
+				.agitUuid(savedAgit.getAgitUuid())
+				.agitName(savedAgit.getAgitName())
+				.description(savedAgit.getDescription())
+				.maximumCapacity(savedAgit.getMaximumCapacity())
+				.code(savedAgit.getCode())
+				.thumbnailPath(savedAgit.getThumbnailPath())
+				.ampId(savedProfile.getId())
+				.nickname(savedProfile.getNickname())
+				.profileImagePath(savedProfile.getProfileImagePath())
+				.role(savedProfile.getRole())
 				.build();
 	}
 

@@ -1,5 +1,6 @@
 package com.plip.agit.adapter.in.web.dto;
 
+import com.plip.agit.domain.model.AgitMemberRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
 import lombok.Builder;
@@ -27,4 +28,16 @@ public class CreateAgitResponse {
 
 	@Schema(description = "섬네일 경로", example = "agits/thumbnails/sample.png")
 	private String thumbnailPath;
+
+	@Schema(description = "방장 프로필 ID (amp_id)", example = "1")
+	private Long ampId;
+
+	@Schema(description = "방장 닉네임", example = "보드왕")
+	private String nickname;
+
+	@Schema(description = "방장 프로필 이미지 경로", example = "profiles/host.png")
+	private String profileImagePath;
+
+	@Schema(description = "방장 역할", example = "HOST")
+	private AgitMemberRole role;
 }

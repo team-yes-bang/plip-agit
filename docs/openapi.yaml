@@ -14,7 +14,7 @@ paths:
       tags:
       - Agit
       summary: 아지트 생성
-      description: 아지트를 생성하고 초대 코드를 발급합니다.
+      description: 아지트와 방장 프로필을 함께 생성하고 초대 코드를 발급합니다.
       operationId: createAgit
       requestBody:
         content:
@@ -72,6 +72,23 @@ components:
           format: int32
           description: "최대 인원 (필수, 기본 허용 상한 5)"
           example: 5
+        thumbnailPath:
+          type: string
+          description: "섬네일 경로 (선택, 최대 255자)"
+          example: agits/thumbnails/sample.png
+        userUuid:
+          type: string
+          format: uuid
+          description: "방장 사용자 UUID (UUIDv7, 임시 body 전달 — 추후 인증에서 추출)"
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        nickname:
+          type: string
+          description: "방장 닉네임 (필수, 영문·숫자·한글 2~12자, 특수문자·공백 불가)"
+          example: 보드왕
+        profileImagePath:
+          type: string
+          description: 방장 프로필 이미지 경로 (선택)
+          example: profiles/host.png
     CreateAgitResponse:
       type: object
       description: 아지트 생성 응답
@@ -98,3 +115,27 @@ components:
           type: string
           description: 초대 코드
           example: AB12CD
+        thumbnailPath:
+          type: string
+          description: 섬네일 경로
+          example: agits/thumbnails/sample.png
+        ampId:
+          type: integer
+          format: int64
+          description: 방장 프로필 ID (amp_id)
+          example: 1
+        nickname:
+          type: string
+          description: 방장 닉네임
+          example: 보드왕
+        profileImagePath:
+          type: string
+          description: 방장 프로필 이미지 경로
+          example: profiles/host.png
+        role:
+          type: string
+          description: 방장 역할
+          enum:
+          - HOST
+          - GUEST
+          example: HOST
