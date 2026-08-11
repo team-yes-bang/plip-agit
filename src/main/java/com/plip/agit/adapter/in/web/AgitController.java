@@ -52,7 +52,7 @@ public class AgitController {
 			summary = "아지트 랜딩 조회",
 			description = "초대 코드로 ACTIVE 아지트의 랜딩 표시 정보를 조회합니다. 인증 없이 호출 가능합니다."
 	)
-	@GetMapping("/codes/{code}")
+	@GetMapping("/{code}/landing")
 	public AgitLandingResponse getLandingByCode(@PathVariable String code) {
 		AgitLandingResultDto resultDto = agitUseCase.getLandingByCode(code);
 		return agitWebMapper.toLandingResponse(resultDto);

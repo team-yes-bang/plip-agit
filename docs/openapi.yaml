@@ -260,7 +260,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "204":
           description: No Content
-  /api/v1/agits/codes/{code}:
+  /api/v1/agits/{code}/landing:
     get:
       tags:
       - Agit
