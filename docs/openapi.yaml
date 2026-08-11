@@ -29,6 +29,90 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CreateAgitResponse"
+  /api/v1/agits/{agitUuid}/members/{userUuid}/unban:
+    post:
+      tags:
+      - Agit
+      summary: 아지트 밴 해제
+      description: 아지트장이 userUuid 기준으로 밴을 해제합니다. BANNED인 멤버는 status를 LEFT로 바꾸고 bans
+        이력에 해제 시각을 기록합니다. 이미 LEFT인 경우 변경 없이 성공합니다.
+      operationId: unbanMember
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: userUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
+        "204":
+          description: No Content
+  /api/v1/agits/{agitUuid}/members/{ampId}/ban:
+    post:
+      tags:
+      - Agit
+      summary: 아지트에서 내보내기
+      description: 아지트장이 ampId로 멤버를 내보냅니다. status를 BANNED로 바꾸고 bans 이력을 남깁니다. 이미 BANNED인
+        경우 변경 없이 성공합니다.
+      operationId: banMember
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: ampId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
+        "204":
+          description: No Content
+  /api/v1/agits/{agitUuid}/leave:
+    post:
+      tags:
+      - Agit
+      summary: 아지트 나가기
+      description: "본인이 아지트에서 나갑니다. GUEST는 status를 LEFT로 변경합니다. HOST는 ACTIVE 인원이 본\
+        인뿐일 때만 나갈 수 있으며, 이때 아지트는 소프트 삭제됩니다. 이미 LEFT이거나 BANNED인 경우 변경 없이 성공합니다."
+      operationId: leaveAgit
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
+        "204":
+          description: No Content
   /api/v1/agits/codes/{code}:
     get:
       tags:
@@ -159,6 +243,15 @@ components:
           - HOST
           - GUEST
           example: HOST
+    ActorUserRequest:
+      type: object
+      description: 액터 사용자 UUID 요청 (임시 — 인증 연동 전)
+      properties:
+        userUuid:
+          type: string
+          format: uuid
+          description: "요청자 사용자 UUID (UUIDv7, 임시 body 전달 — 추후 인증에서 추출)"
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
     AgitLandingResponse:
       type: object
       description: 아지트 랜딩 조회 응답 (표시 전용)
