@@ -49,6 +49,30 @@ public class AgitMemberProfile {
 				.build();
 	}
 
+	public static AgitMemberProfile createGuest(
+			Long agitId,
+			UUID userUuid,
+			String nickname,
+			String profileImagePath
+	) {
+		if (agitId == null) {
+			throw new IllegalArgumentException("아지트 ID는 필수입니다.");
+		}
+		if (userUuid == null) {
+			throw new IllegalArgumentException("사용자 UUID는 필수입니다.");
+		}
+
+		return AgitMemberProfile.builder()
+				.agitId(agitId)
+				.userUuid(userUuid)
+				.nickname(requireNickname(nickname))
+				.profileImagePath(normalizeProfileImagePath(profileImagePath))
+				.status(AgitMemberStatus.ACTIVE)
+				.role(AgitMemberRole.GUEST)
+				.applyItems(null)
+				.build();
+	}
+
 	public static AgitMemberProfile reconstitute(
 			Long id,
 			Long agitId,
@@ -102,6 +126,18 @@ public class AgitMemberProfile {
 			throw new IllegalStateException("밴 상태가 아닌 멤버는 해제할 수 없습니다.");
 		}
 		this.status = AgitMemberStatus.LEFT;
+	}
+
+	/**
+	 * LEFT 상태에서 재입장. 닉네임·프로필 이미지를 요청값으로 갱신하고 ACTIVE로 전환한다.
+	 */
+	public void rejoin(String nickname, String profileImagePath) {
+		if (this.status != AgitMemberStatus.LEFT) {
+			throw new IllegalStateException("LEFT 상태가 아닌 멤버는 재입장할 수 없습니다.");
+		}
+		this.nickname = requireNickname(nickname);
+		this.profileImagePath = normalizeProfileImagePath(profileImagePath);
+		this.status = AgitMemberStatus.ACTIVE;
 	}
 
 	private static String requireNickname(String nickname) {

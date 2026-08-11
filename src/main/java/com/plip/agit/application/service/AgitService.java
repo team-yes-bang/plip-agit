@@ -1,5 +1,8 @@
 package com.plip.agit.application.service;
 
+import com.plip.agit.application.exception.AgitAlreadyJoinedException;
+import com.plip.agit.application.exception.AgitBannedException;
+import com.plip.agit.application.exception.AgitCapacityExceededException;
 import com.plip.agit.application.exception.AgitMemberNotFoundException;
 import com.plip.agit.application.exception.AgitNotFoundException;
 import com.plip.agit.application.exception.InvalidInviteCodeException;
@@ -7,6 +10,8 @@ import com.plip.agit.application.port.in.AgitUseCase;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
+import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
+import com.plip.agit.application.port.in.dto.JoinAgitResultDto;
 import com.plip.agit.application.port.out.AgitBanPersistencePort;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
@@ -117,11 +122,67 @@ public class AgitService implements AgitUseCase {
 	}
 
 	/**
+	 * 초대 코드로 아지트에 입장한다. 신규는 GUEST INSERT, LEFT는 닉네임·이미지 갱신 후 ACTIVE.
+	 *
+	 * <p>TODO(auth): userUuid는 Gateway/JWT에서 추출하도록 교체한다.
+	 * TODO(side-effect): join 후 document/캐시 갱신 및 MemberJoined 이벤트 발행.
+	 */
+	@Override
+	@Transactional
+	public JoinAgitResultDto joinAgit(String code, JoinAgitRequestDto requestDto) {
+		requireActorUserUuid(requestDto.getUserUuid());
+
+		String normalizedCode = normalizeInviteCode(code);
+		Agit agit = agitPersistencePort.findActiveByCode(normalizedCode)
+				.orElseThrow(AgitNotFoundException::new);
+
+		var existingProfile = agitMemberProfilePersistencePort
+				.findByAgitIdAndUserUuid(agit.getId(), requestDto.getUserUuid());
+
+		if (existingProfile.isPresent()) {
+			AgitMemberProfile profile = existingProfile.get();
+			if (profile.getStatus() == AgitMemberStatus.BANNED) {
+				throw new AgitBannedException();
+			}
+			if (profile.getStatus() == AgitMemberStatus.ACTIVE) {
+				throw new AgitAlreadyJoinedException(profile.getId());
+			}
+		}
+
+		long currentMemberCount = agitMemberProfilePersistencePort.countActiveByAgitId(agit.getId());
+		if (currentMemberCount >= agit.getMaximumCapacity()) {
+			throw new AgitCapacityExceededException();
+		}
+
+		AgitMemberProfile savedProfile;
+		if (existingProfile.isEmpty()) {
+			AgitMemberProfile guest = AgitMemberProfile.createGuest(
+					agit.getId(),
+					requestDto.getUserUuid(),
+					requestDto.getNickname(),
+					requestDto.getProfileImagePath()
+			);
+			savedProfile = agitMemberProfilePersistencePort.save(guest);
+		} else {
+			AgitMemberProfile profile = existingProfile.get();
+			profile.rejoin(requestDto.getNickname(), requestDto.getProfileImagePath());
+			savedProfile = agitMemberProfilePersistencePort.save(profile);
+		}
+
+		return JoinAgitResultDto.builder()
+				.agitUuid(agit.getAgitUuid())
+				.ampId(savedProfile.getId())
+				.nickname(savedProfile.getNickname())
+				.profileImagePath(savedProfile.getProfileImagePath())
+				.role(savedProfile.getRole())
+				.build();
+	}
+
+	/**
 	 * 아지트장이 멤버를 내보낸다. ampId로 대상을 찾고, 이후 식별은 userUuid.
 	 *
 	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 * TODO(side-effect): ban 후 document/캐시 갱신 및 MemberBanned 이벤트 발행.
-	 * TODO(join): 재입장 API에서 status == BANNED 이면 입장 거부.
 	 */
 	@Override
 	@Transactional
@@ -198,7 +259,6 @@ public class AgitService implements AgitUseCase {
 	 *
 	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 * TODO(side-effect): unban 후 document/캐시 갱신 및 MemberUnbanned 이벤트 발행.
-	 * TODO(join): 재입장 API에서 LEFT는 재가입 허용, BANNED는 거부.
 	 */
 	@Override
 	@Transactional
