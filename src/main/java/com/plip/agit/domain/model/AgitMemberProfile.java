@@ -71,6 +71,16 @@ public class AgitMemberProfile {
 				.build();
 	}
 
+	/**
+	 * 아지트에서 내보내기. 이미 BANNED면 멱등 no-op.
+	 */
+	public void ban() {
+		if (this.status == AgitMemberStatus.BANNED) {
+			return;
+		}
+		this.status = AgitMemberStatus.BANNED;
+	}
+
 	private static String requireNickname(String nickname) {
 		if (nickname == null || nickname.isBlank()) {
 			throw new IllegalArgumentException("닉네임은 필수입니다.");

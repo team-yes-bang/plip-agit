@@ -1,17 +1,24 @@
 package com.plip.agit.application.service;
 
+import com.plip.agit.application.exception.AgitMemberNotFoundException;
 import com.plip.agit.application.exception.AgitNotFoundException;
 import com.plip.agit.application.exception.InvalidInviteCodeException;
 import com.plip.agit.application.port.in.AgitUseCase;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
+import com.plip.agit.application.port.out.AgitBanPersistencePort;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
 import com.plip.agit.domain.model.Agit;
+import com.plip.agit.domain.model.AgitBan;
 import com.plip.agit.domain.model.AgitMemberProfile;
+import com.plip.agit.domain.model.AgitMemberRole;
+import com.plip.agit.domain.model.AgitMemberStatus;
+import com.plip.agit.domain.model.AgitStatus;
 import java.security.SecureRandom;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +35,7 @@ public class AgitService implements AgitUseCase {
 
 	private final AgitPersistencePort agitPersistencePort;
 	private final AgitMemberProfilePersistencePort agitMemberProfilePersistencePort;
+	private final AgitBanPersistencePort agitBanPersistencePort;
 	private final SecureRandom secureRandom = new SecureRandom();
 
 	@Override
@@ -105,6 +113,74 @@ public class AgitService implements AgitUseCase {
 				.hostNickname(host.getNickname())
 				.thumbnailPath(agit.getThumbnailPath())
 				.build();
+	}
+
+	/**
+	 * 아지트장이 멤버를 내보낸다. ampId로 대상을 찾고, 이후 식별은 userUuid.
+	 *
+	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
+	 * TODO(side-effect): ban 후 document/캐시 갱신 및 MemberBanned 이벤트 발행.
+	 * TODO(join): 재입장 API에서 status == BANNED 이면 입장 거부.
+	 */
+	@Override
+	@Transactional
+	public void banMember(UUID agitUuid, Long ampId, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+		if (ampId == null) {
+			throw new IllegalArgumentException("멤버 프로필 ID는 필수입니다.");
+		}
+
+		Agit agit = requireActiveAgit(agitUuid);
+		requireActiveHost(agit.getId(), actorUserUuid);
+
+		AgitMemberProfile target = agitMemberProfilePersistencePort.findById(ampId)
+				.orElseThrow(AgitMemberNotFoundException::new);
+		if (!agit.getId().equals(target.getAgitId())) {
+			throw new AgitMemberNotFoundException();
+		}
+
+		if (target.getStatus() == AgitMemberStatus.BANNED) {
+			return;
+		}
+
+		target.ban();
+		agitMemberProfilePersistencePort.save(target);
+
+		AgitBan ban = AgitBan.create(
+				agit.getId(),
+				target.getUserUuid(),
+				target.getId(),
+				target.getNickname()
+		);
+		agitBanPersistencePort.save(ban);
+	}
+
+	private Agit requireActiveAgit(UUID agitUuid) {
+		if (agitUuid == null) {
+			throw new IllegalArgumentException("아지트 UUID는 필수입니다.");
+		}
+		Agit agit = agitPersistencePort.findByAgitUuid(agitUuid)
+				.orElseThrow(AgitNotFoundException::new);
+		if (agit.getStatus() != AgitStatus.ACTIVE) {
+			throw new AgitNotFoundException();
+		}
+		return agit;
+	}
+
+	private AgitMemberProfile requireActiveHost(Long agitId, UUID actorUserUuid) {
+		AgitMemberProfile actor = agitMemberProfilePersistencePort
+				.findByAgitIdAndUserUuid(agitId, actorUserUuid)
+				.orElseThrow(() -> new IllegalStateException("아지트장만 수행할 수 있습니다."));
+		if (actor.getRole() != AgitMemberRole.HOST || actor.getStatus() != AgitMemberStatus.ACTIVE) {
+			throw new IllegalStateException("아지트장만 수행할 수 있습니다.");
+		}
+		return actor;
+	}
+
+	private void requireActorUserUuid(UUID actorUserUuid) {
+		if (actorUserUuid == null) {
+			throw new IllegalArgumentException("사용자 UUID는 필수입니다.");
+		}
 	}
 
 	private String normalizeInviteCode(String code) {

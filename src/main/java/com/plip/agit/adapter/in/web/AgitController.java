@@ -1,5 +1,6 @@
 package com.plip.agit.adapter.in.web;
 
+import com.plip.agit.adapter.in.web.dto.ActorUserRequest;
 import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
@@ -10,6 +11,7 @@ import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,5 +52,20 @@ public class AgitController {
 	public AgitLandingResponse getLandingByCode(@PathVariable String code) {
 		AgitLandingResultDto resultDto = agitUseCase.getLandingByCode(code);
 		return agitWebMapper.toLandingResponse(resultDto);
+	}
+
+	@Operation(
+			summary = "아지트에서 내보내기",
+			description = "아지트장이 ampId로 멤버를 내보냅니다. status를 BANNED로 바꾸고 bans 이력을 남깁니다. 이미 BANNED인 경우 변경 없이 성공합니다."
+	)
+	@PostMapping("/{agitUuid}/members/{ampId}/ban")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void banMember(
+			@PathVariable UUID agitUuid,
+			@PathVariable Long ampId,
+			@RequestBody ActorUserRequest request
+	) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		agitUseCase.banMember(agitUuid, ampId, request.getUserUuid());
 	}
 }
