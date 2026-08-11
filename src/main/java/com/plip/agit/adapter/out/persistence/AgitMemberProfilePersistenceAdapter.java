@@ -28,9 +28,11 @@ public class AgitMemberProfilePersistenceAdapter implements AgitMemberProfilePer
 			return agitMemberProfileEntityMapper.toDomain(saved);
 		}
 
-		agitMemberProfileRepository.updateStatusById(
+		agitMemberProfileRepository.updateMembershipById(
 				profile.getId(),
 				agitMemberProfileEntityMapper.toEntityStatus(profile.getStatus()),
+				profile.getNickname(),
+				profile.getProfileImagePath(),
 				LocalDateTime.now()
 		);
 
