@@ -12,4 +12,6 @@ public interface AgitUseCase {
 	AgitLandingResultDto getLandingByCode(String code);
 
 	void banMember(UUID agitUuid, Long ampId, UUID actorUserUuid);
+
+	void leaveAgit(UUID agitUuid, UUID actorUserUuid);
 }

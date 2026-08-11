@@ -68,4 +68,18 @@ public class AgitController {
 		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
 		agitUseCase.banMember(agitUuid, ampId, request.getUserUuid());
 	}
+
+	@Operation(
+			summary = "아지트 나가기",
+			description = "본인이 아지트에서 나갑니다. GUEST는 status를 LEFT로 변경합니다. HOST는 ACTIVE 인원이 본인뿐일 때만 나갈 수 있으며, 이때 아지트는 소프트 삭제됩니다. 이미 LEFT이거나 BANNED인 경우 변경 없이 성공합니다."
+	)
+	@PostMapping("/{agitUuid}/leave")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void leaveAgit(
+			@PathVariable UUID agitUuid,
+			@RequestBody ActorUserRequest request
+	) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		agitUseCase.leaveAgit(agitUuid, request.getUserUuid());
+	}
 }

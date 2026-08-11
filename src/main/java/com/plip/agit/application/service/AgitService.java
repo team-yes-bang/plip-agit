@@ -155,6 +155,43 @@ public class AgitService implements AgitUseCase {
 		agitBanPersistencePort.save(ban);
 	}
 
+	/**
+	 * 아지트에서 나간다. HOST는 ACTIVE 인원이 본인 1명일 때만 가능하며, 이때 아지트를 소프트 삭제한다.
+	 *
+	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
+	 * TODO(side-effect): leave/삭제 후 document/캐시 갱신 및 이벤트 발행.
+	 */
+	@Override
+	@Transactional
+	public void leaveAgit(UUID agitUuid, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+
+		Agit agit = requireActiveAgit(agitUuid);
+		AgitMemberProfile profile = agitMemberProfilePersistencePort
+				.findByAgitIdAndUserUuid(agit.getId(), actorUserUuid)
+				.orElseThrow(AgitMemberNotFoundException::new);
+
+		if (profile.getStatus() == AgitMemberStatus.LEFT
+				|| profile.getStatus() == AgitMemberStatus.BANNED) {
+			return;
+		}
+
+		if (profile.getRole() == AgitMemberRole.HOST) {
+			long activeCount = agitMemberProfilePersistencePort.countActiveByAgitId(agit.getId());
+			if (activeCount != 1) {
+				throw new IllegalStateException("방장은 다른 ACTIVE 멤버가 없을 때만 나갈 수 있습니다.");
+			}
+			profile.leave();
+			agitMemberProfilePersistencePort.save(profile);
+			agit.delete();
+			agitPersistencePort.save(agit);
+			return;
+		}
+
+		profile.leave();
+		agitMemberProfilePersistencePort.save(profile);
+	}
+
 	private Agit requireActiveAgit(UUID agitUuid) {
 		if (agitUuid == null) {
 			throw new IllegalArgumentException("아지트 UUID는 필수입니다.");
