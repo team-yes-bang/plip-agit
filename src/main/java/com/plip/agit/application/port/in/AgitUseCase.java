@@ -14,4 +14,6 @@ public interface AgitUseCase {
 	void banMember(UUID agitUuid, Long ampId, UUID actorUserUuid);
 
 	void leaveAgit(UUID agitUuid, UUID actorUserUuid);
+
+	void unbanMember(UUID agitUuid, UUID targetUserUuid, UUID actorUserUuid);
 }

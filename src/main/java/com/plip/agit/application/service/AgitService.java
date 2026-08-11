@@ -17,6 +17,7 @@ import com.plip.agit.domain.model.AgitMemberRole;
 import com.plip.agit.domain.model.AgitMemberStatus;
 import com.plip.agit.domain.model.AgitStatus;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -189,6 +190,45 @@ public class AgitService implements AgitUseCase {
 		}
 
 		profile.leave();
+		agitMemberProfilePersistencePort.save(profile);
+	}
+
+	/**
+	 * 밴을 해제한다. 성공 시 profile status는 항상 LEFT(멱등).
+	 *
+	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
+	 * TODO(side-effect): unban 후 document/캐시 갱신 및 MemberUnbanned 이벤트 발행.
+	 * TODO(join): 재입장 API에서 LEFT는 재가입 허용, BANNED는 거부.
+	 */
+	@Override
+	@Transactional
+	public void unbanMember(UUID agitUuid, UUID targetUserUuid, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+		if (targetUserUuid == null) {
+			throw new IllegalArgumentException("대상 사용자 UUID는 필수입니다.");
+		}
+
+		Agit agit = requireActiveAgit(agitUuid);
+		requireActiveHost(agit.getId(), actorUserUuid);
+
+		AgitMemberProfile profile = agitMemberProfilePersistencePort
+				.findByAgitIdAndUserUuid(agit.getId(), targetUserUuid)
+				.orElseThrow(AgitMemberNotFoundException::new);
+
+		if (profile.getStatus() == AgitMemberStatus.LEFT) {
+			return;
+		}
+		if (profile.getStatus() != AgitMemberStatus.BANNED) {
+			throw new IllegalStateException("밴 상태가 아닌 멤버는 해제할 수 없습니다.");
+		}
+
+		agitBanPersistencePort.findActiveByAgitIdAndUserUuid(agit.getId(), targetUserUuid)
+				.ifPresent(ban -> {
+					ban.unban(LocalDateTime.now());
+					agitBanPersistencePort.save(ban);
+				});
+
+		profile.unbanToLeft();
 		agitMemberProfilePersistencePort.save(profile);
 	}
 

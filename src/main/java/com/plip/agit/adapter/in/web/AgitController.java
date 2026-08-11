@@ -82,4 +82,19 @@ public class AgitController {
 		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
 		agitUseCase.leaveAgit(agitUuid, request.getUserUuid());
 	}
+
+	@Operation(
+			summary = "아지트 밴 해제",
+			description = "아지트장이 userUuid 기준으로 밴을 해제합니다. BANNED인 멤버는 status를 LEFT로 바꾸고 bans 이력에 해제 시각을 기록합니다. 이미 LEFT인 경우 변경 없이 성공합니다."
+	)
+	@PostMapping("/{agitUuid}/members/{userUuid}/unban")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void unbanMember(
+			@PathVariable UUID agitUuid,
+			@PathVariable UUID userUuid,
+			@RequestBody ActorUserRequest request
+	) {
+		// TODO: userUuid(actor)는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		agitUseCase.unbanMember(agitUuid, userUuid, request.getUserUuid());
+	}
 }
