@@ -4,11 +4,15 @@ import com.plip.agit.adapter.in.web.dto.ActorUserRequest;
 import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
+import com.plip.agit.adapter.in.web.dto.JoinAgitRequest;
+import com.plip.agit.adapter.in.web.dto.JoinAgitResponse;
 import com.plip.agit.adapter.in.web.mapper.AgitWebMapper;
 import com.plip.agit.application.port.in.AgitUseCase;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
+import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
+import com.plip.agit.application.port.in.dto.JoinAgitResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
@@ -52,6 +56,22 @@ public class AgitController {
 	public AgitLandingResponse getLandingByCode(@PathVariable String code) {
 		AgitLandingResultDto resultDto = agitUseCase.getLandingByCode(code);
 		return agitWebMapper.toLandingResponse(resultDto);
+	}
+
+	@Operation(
+			summary = "아지트 입장",
+			description = "초대 코드로 아지트에 입장합니다. 신규는 GUEST 프로필을 생성하고, LEFT는 닉네임·이미지를 갱신한 뒤 ACTIVE로 전환합니다. 이미 ACTIVE면 409, BANNED면 403, 정원 초과면 409를 반환합니다."
+	)
+	@PostMapping("/{code}/join")
+	@ResponseStatus(HttpStatus.CREATED)
+	public JoinAgitResponse joinAgit(
+			@PathVariable String code,
+			@RequestBody JoinAgitRequest request
+	) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		JoinAgitRequestDto requestDto = agitWebMapper.toJoinDto(request);
+		JoinAgitResultDto resultDto = agitUseCase.joinAgit(code, requestDto);
+		return agitWebMapper.toJoinResponse(resultDto);
 	}
 
 	@Operation(
