@@ -23,12 +23,87 @@ paths:
               $ref: "#/components/schemas/CreateAgitRequest"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "201":
           description: Created
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CreateAgitResponse"
+  /api/v1/agits/{code}/join:
+    post:
+      tags:
+      - Agit
+      summary: 아지트 입장
+      description: "초대 코드로 아지트에 입장합니다. 신규는 GUEST 프로필을 생성하고, LEFT는 닉네임·이미지를 갱신한 뒤 ACTIVE로\
+        \ 전환합니다. 이미 ACTIVE면 409, BANNED면 403, 정원 초과면 409를 반환합니다."
+      operationId: joinAgit
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinAgitRequest"
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/JoinAgitResponse"
   /api/v1/agits/{agitUuid}/members/{userUuid}/unban:
     post:
       tags:
@@ -57,6 +132,30 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "204":
           description: No Content
   /api/v1/agits/{agitUuid}/members/{ampId}/ban:
@@ -87,6 +186,30 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "204":
           description: No Content
   /api/v1/agits/{agitUuid}/leave:
@@ -111,6 +234,30 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "204":
           description: No Content
   /api/v1/agits/codes/{code}:
@@ -127,6 +274,30 @@ paths:
         schema:
           type: string
       responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "200":
           description: OK
           content:
@@ -139,6 +310,30 @@ paths:
       - test-controller
       operationId: test
       responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "200":
           description: OK
           content:
@@ -151,6 +346,30 @@ paths:
       - test-controller
       operationId: ping
       responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "200":
           description: OK
           content:
@@ -159,6 +378,23 @@ paths:
                 type: string
 components:
   schemas:
+    ErrorResponse:
+      type: object
+      description: 에러 응답
+      properties:
+        code:
+          type: string
+          description: 에러 코드
+          example: ALREADY_JOINED
+        message:
+          type: string
+          description: 에러 메시지
+          example: 이미 참여 중인 아지트입니다.
+        ampId:
+          type: integer
+          format: int64
+          description: 이미 가입된 멤버 프로필 ID (해당 시)
+          example: 1
     CreateAgitRequest:
       type: object
       description: 아지트 생성 요청
@@ -243,6 +479,52 @@ components:
           - HOST
           - GUEST
           example: HOST
+    JoinAgitRequest:
+      type: object
+      description: 아지트 입장 요청
+      properties:
+        userUuid:
+          type: string
+          format: uuid
+          description: "사용자 UUID (UUIDv7, 임시 body 전달 — 추후 인증에서 추출)"
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        nickname:
+          type: string
+          description: "닉네임 (필수, 영문·숫자·한글 2~12자, 특수문자·공백 불가)"
+          example: 보드왕
+        profileImagePath:
+          type: string
+          description: 프로필 이미지 경로 (선택)
+          example: profiles/guest.png
+    JoinAgitResponse:
+      type: object
+      description: 아지트 입장 응답
+      properties:
+        agitUuid:
+          type: string
+          format: uuid
+          description: 아지트 UUID
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        ampId:
+          type: integer
+          format: int64
+          description: 멤버 프로필 ID (amp_id)
+          example: 1
+        nickname:
+          type: string
+          description: 닉네임
+          example: 보드왕
+        profileImagePath:
+          type: string
+          description: 프로필 이미지 경로
+          example: profiles/guest.png
+        role:
+          type: string
+          description: 역할
+          enum:
+          - HOST
+          - GUEST
+          example: GUEST
     ActorUserRequest:
       type: object
       description: 액터 사용자 UUID 요청 (임시 — 인증 연동 전)
