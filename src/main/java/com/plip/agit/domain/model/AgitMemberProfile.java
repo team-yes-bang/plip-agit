@@ -71,6 +71,39 @@ public class AgitMemberProfile {
 				.build();
 	}
 
+	/**
+	 * 아지트에서 내보내기. 이미 BANNED면 멱등 no-op.
+	 */
+	public void ban() {
+		if (this.status == AgitMemberStatus.BANNED) {
+			return;
+		}
+		this.status = AgitMemberStatus.BANNED;
+	}
+
+	/**
+	 * 아지트 나가기. 이미 LEFT면 멱등 no-op. 이미 BANNED면 멱등 no-op.
+	 */
+	public void leave() {
+		if (this.status == AgitMemberStatus.LEFT || this.status == AgitMemberStatus.BANNED) {
+			return;
+		}
+		this.status = AgitMemberStatus.LEFT;
+	}
+
+	/**
+	 * 밴 해제 후 LEFT로 수렴. 이미 LEFT면 멱등 no-op.
+	 */
+	public void unbanToLeft() {
+		if (this.status == AgitMemberStatus.LEFT) {
+			return;
+		}
+		if (this.status != AgitMemberStatus.BANNED) {
+			throw new IllegalStateException("밴 상태가 아닌 멤버는 해제할 수 없습니다.");
+		}
+		this.status = AgitMemberStatus.LEFT;
+	}
+
 	private static String requireNickname(String nickname) {
 		if (nickname == null || nickname.isBlank()) {
 			throw new IllegalArgumentException("닉네임은 필수입니다.");

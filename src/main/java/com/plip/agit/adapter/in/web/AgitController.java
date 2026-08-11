@@ -1,5 +1,6 @@
 package com.plip.agit.adapter.in.web;
 
+import com.plip.agit.adapter.in.web.dto.ActorUserRequest;
 import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
@@ -10,6 +11,7 @@ import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,5 +52,49 @@ public class AgitController {
 	public AgitLandingResponse getLandingByCode(@PathVariable String code) {
 		AgitLandingResultDto resultDto = agitUseCase.getLandingByCode(code);
 		return agitWebMapper.toLandingResponse(resultDto);
+	}
+
+	@Operation(
+			summary = "아지트에서 내보내기",
+			description = "아지트장이 ampId로 멤버를 내보냅니다. status를 BANNED로 바꾸고 bans 이력을 남깁니다. 이미 BANNED인 경우 변경 없이 성공합니다."
+	)
+	@PostMapping("/{agitUuid}/members/{ampId}/ban")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void banMember(
+			@PathVariable UUID agitUuid,
+			@PathVariable Long ampId,
+			@RequestBody ActorUserRequest request
+	) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		agitUseCase.banMember(agitUuid, ampId, request.getUserUuid());
+	}
+
+	@Operation(
+			summary = "아지트 나가기",
+			description = "본인이 아지트에서 나갑니다. GUEST는 status를 LEFT로 변경합니다. HOST는 ACTIVE 인원이 본인뿐일 때만 나갈 수 있으며, 이때 아지트는 소프트 삭제됩니다. 이미 LEFT이거나 BANNED인 경우 변경 없이 성공합니다."
+	)
+	@PostMapping("/{agitUuid}/leave")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void leaveAgit(
+			@PathVariable UUID agitUuid,
+			@RequestBody ActorUserRequest request
+	) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		agitUseCase.leaveAgit(agitUuid, request.getUserUuid());
+	}
+
+	@Operation(
+			summary = "아지트 밴 해제",
+			description = "아지트장이 userUuid 기준으로 밴을 해제합니다. BANNED인 멤버는 status를 LEFT로 바꾸고 bans 이력에 해제 시각을 기록합니다. 이미 LEFT인 경우 변경 없이 성공합니다."
+	)
+	@PostMapping("/{agitUuid}/members/{userUuid}/unban")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void unbanMember(
+			@PathVariable UUID agitUuid,
+			@PathVariable UUID userUuid,
+			@RequestBody ActorUserRequest request
+	) {
+		// TODO: userUuid(actor)는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		agitUseCase.unbanMember(agitUuid, userUuid, request.getUserUuid());
 	}
 }

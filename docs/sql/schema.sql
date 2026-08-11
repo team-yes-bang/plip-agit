@@ -29,3 +29,14 @@ CREATE TABLE agit_member_profiles (
     updated_at           DATETIME     NOT NULL,
     CONSTRAINT uq_agit_user UNIQUE (agit_id, user_uuid)
 );
+
+CREATE TABLE agit_bans (
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    agit_id          BIGINT       NOT NULL,
+    user_uuid        BINARY(16)   NOT NULL COMMENT 'UUIDv7',
+    amp_id           BIGINT       NOT NULL COMMENT '스냅샷',
+    banned_nickname  VARCHAR(100) NOT NULL COMMENT '스냅샷',
+    banned_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    unbanned_at      DATETIME     NULL,
+    INDEX idx_agit_bans_agit_user (agit_id, user_uuid)
+);
