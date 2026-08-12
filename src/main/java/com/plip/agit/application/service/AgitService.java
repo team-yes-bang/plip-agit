@@ -3,6 +3,7 @@ package com.plip.agit.application.service;
 import com.plip.agit.application.exception.AgitAlreadyJoinedException;
 import com.plip.agit.application.exception.AgitBannedException;
 import com.plip.agit.application.exception.AgitCapacityExceededException;
+import com.plip.agit.application.exception.AgitMemberNotActiveException;
 import com.plip.agit.application.exception.AgitMemberNotFoundException;
 import com.plip.agit.application.exception.AgitNotFoundException;
 import com.plip.agit.application.exception.CannotBanHostException;
@@ -17,9 +18,13 @@ import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
 import com.plip.agit.application.port.in.dto.JoinAgitResultDto;
+import com.plip.agit.application.port.in.dto.MyAgitItemDto;
 import com.plip.agit.application.port.in.dto.ReissueInviteCodeResultDto;
 import com.plip.agit.application.port.in.dto.UpdateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.UpdateAgitResultDto;
+import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileRequestDto;
+import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileResultDto;
+import com.plip.agit.application.port.out.ActiveMembershipAgit;
 import com.plip.agit.application.port.out.AgitBanPersistencePort;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
@@ -31,6 +36,7 @@ import com.plip.agit.domain.model.AgitMemberStatus;
 import com.plip.agit.domain.model.AgitStatus;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -399,6 +405,58 @@ public class AgitService implements AgitUseCase {
 
 		return ReissueInviteCodeResultDto.builder()
 				.code(saved.getCode())
+				.build();
+	}
+
+	/**
+	 * 접속 유저가 ACTIVE로 속한 아지트 목록을 조회한다.
+	 *
+	 * <p>TODO(auth): userUuid는 Gateway/JWT에서 추출하도록 교체한다.
+	 * 정렬: agit.updated_at DESC (임시). 이후 최근 토픽순(Redis/토픽 서비스)으로 교체한다.
+	 */
+	@Override
+	public List<MyAgitItemDto> listMyAgits(UUID userUuid) {
+		requireActorUserUuid(userUuid);
+
+		List<ActiveMembershipAgit> rows =
+				agitMemberProfilePersistencePort.findActiveMembershipAgitsByUserUuid(userUuid);
+
+		return rows.stream()
+				.map(row -> MyAgitItemDto.builder()
+						.agitUuid(row.agitUuid())
+						.agitName(row.agitName())
+						.build())
+				.toList();
+	}
+
+	/**
+	 * 접속 유저의 아지트 멤버 프로필(닉네임·이미지)을 부분 수정한다. ACTIVE만 허용.
+	 *
+	 * <p>TODO(auth): userUuid는 Gateway/JWT에서 추출하도록 교체한다.
+	 */
+	@Override
+	@Transactional
+	public UpdateMyMemberProfileResultDto updateMyMemberProfile(
+			UUID agitUuid,
+			UpdateMyMemberProfileRequestDto requestDto
+	) {
+		requireActorUserUuid(requestDto.getUserUuid());
+
+		Agit agit = requireActiveAgit(agitUuid);
+		AgitMemberProfile profile = agitMemberProfilePersistencePort
+				.findByAgitIdAndUserUuid(agit.getId(), requestDto.getUserUuid())
+				.orElseThrow(AgitMemberNotFoundException::new);
+
+		if (profile.getStatus() != AgitMemberStatus.ACTIVE) {
+			throw new AgitMemberNotActiveException();
+		}
+
+		profile.updateProfile(requestDto.getNickname(), requestDto.getProfileImagePath());
+		AgitMemberProfile saved = agitMemberProfilePersistencePort.save(profile);
+
+		return UpdateMyMemberProfileResultDto.builder()
+				.nickname(saved.getNickname())
+				.profileImagePath(saved.getProfileImagePath())
 				.build();
 	}
 
