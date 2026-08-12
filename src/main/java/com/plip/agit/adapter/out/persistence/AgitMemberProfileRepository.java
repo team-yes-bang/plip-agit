@@ -1,6 +1,7 @@
 package com.plip.agit.adapter.out.persistence;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,25 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface AgitMemberProfileRepository extends JpaRepository<AgitMemberProfileEntity, Long> {
+
+	/**
+	 * ACTIVE 멤버십 + ACTIVE 아지트 목록.
+	 * 정렬: agits.updated_at DESC (임시). 이후 최근 토픽순(Redis/토픽 서비스)으로 교체한다.
+	 */
+	@Query("""
+			SELECT new com.plip.agit.adapter.out.persistence.MyAgitListRow(a.agitUuid, a.agitName)
+			  FROM AgitMemberProfileEntity p, AgitEntity a
+			 WHERE p.agitId = a.id
+			   AND p.userUuid = :userUuid
+			   AND p.status = :memberStatus
+			   AND a.status = :agitStatus
+			 ORDER BY a.updatedAt DESC
+			""")
+	List<MyAgitListRow> findActiveMembershipAgitsByUserUuid(
+			@Param("userUuid") UUID userUuid,
+			@Param("memberStatus") AgitMemberStatus memberStatus,
+			@Param("agitStatus") AgitStatus agitStatus
+	);
 
 	Optional<AgitMemberProfileEntity> findByAgitIdAndUserUuid(Long agitId, UUID userUuid);
 

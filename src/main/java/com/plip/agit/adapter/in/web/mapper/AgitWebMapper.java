@@ -5,17 +5,24 @@ import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
 import com.plip.agit.adapter.in.web.dto.JoinAgitRequest;
 import com.plip.agit.adapter.in.web.dto.JoinAgitResponse;
+import com.plip.agit.adapter.in.web.dto.MyAgitItemResponse;
 import com.plip.agit.adapter.in.web.dto.ReissueInviteCodeResponse;
 import com.plip.agit.adapter.in.web.dto.UpdateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.UpdateAgitResponse;
+import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileRequest;
+import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileResponse;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
 import com.plip.agit.application.port.in.dto.JoinAgitResultDto;
+import com.plip.agit.application.port.in.dto.MyAgitItemDto;
 import com.plip.agit.application.port.in.dto.ReissueInviteCodeResultDto;
 import com.plip.agit.application.port.in.dto.UpdateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.UpdateAgitResultDto;
+import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileRequestDto;
+import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileResultDto;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -100,6 +107,32 @@ public class AgitWebMapper {
 	public ReissueInviteCodeResponse toReissueResponse(ReissueInviteCodeResultDto resultDto) {
 		return ReissueInviteCodeResponse.builder()
 				.code(resultDto.getCode())
+				.build();
+	}
+
+	public List<MyAgitItemResponse> toMyAgitResponses(List<MyAgitItemDto> resultDtos) {
+		return resultDtos.stream()
+				.map(dto -> MyAgitItemResponse.builder()
+						.agitUuid(dto.getAgitUuid())
+						.agitName(dto.getAgitName())
+						.build())
+				.toList();
+	}
+
+	public UpdateMyMemberProfileRequestDto toUpdateMyProfileDto(UpdateMyMemberProfileRequest request) {
+		return UpdateMyMemberProfileRequestDto.builder()
+				.userUuid(request.getUserUuid())
+				.nickname(request.getNickname())
+				.profileImagePath(request.getProfileImagePath())
+				.build();
+	}
+
+	public UpdateMyMemberProfileResponse toUpdateMyProfileResponse(
+			UpdateMyMemberProfileResultDto resultDto
+	) {
+		return UpdateMyMemberProfileResponse.builder()
+				.nickname(resultDto.getNickname())
+				.profileImagePath(resultDto.getProfileImagePath())
 				.build();
 	}
 }

@@ -141,6 +141,22 @@ public class AgitMemberProfile {
 	}
 
 	/**
+	 * ACTIVE 본인 프로필 부분 수정. null인 필드는 유지한다.
+	 * profileImagePath에 빈 문자열을 보내면 이미지를 제거한다.
+	 */
+	public void updateProfile(String nickname, String profileImagePath) {
+		if (this.status != AgitMemberStatus.ACTIVE) {
+			throw new IllegalStateException("ACTIVE 멤버만 프로필을 수정할 수 있습니다.");
+		}
+		if (nickname != null) {
+			this.nickname = requireNickname(nickname);
+		}
+		if (profileImagePath != null) {
+			this.profileImagePath = normalizeProfileImagePath(profileImagePath);
+		}
+	}
+
+	/**
 	 * 방장 위임: ACTIVE HOST만 GUEST로 강등한다.
 	 */
 	public void demoteToGuest() {

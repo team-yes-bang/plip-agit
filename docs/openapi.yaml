@@ -23,8 +23,8 @@ paths:
               $ref: "#/components/schemas/CreateAgitRequest"
         required: true
       responses:
-        "403":
-          description: Forbidden
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -35,8 +35,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -53,163 +53,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CreateAgitResponse"
-  /api/v1/agits/{agitUuid}:
-    patch:
-      tags:
-      - Agit
-      summary: 아지트 정보 변경
-      description: 아지트장이 제목·인원·소개글·섬네일을 수정합니다. 변경 인원수는 현재 ACTIVE 인원보다
-        작을 수 없으며, 그 외 검증은 생성과 동일합니다.
-      operationId: updateAgit
-      parameters:
-      - name: agitUuid
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateAgitRequest"
-        required: true
-      responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UpdateAgitResponse"
-  /api/v1/agits/{agitUuid}/invite-code:
-    post:
-      tags:
-      - Agit
-      summary: 초대 코드 재발급
-      description: 아지트장이 초대 코드를 재발급합니다. 호출마다 새 코드를 반환합니다. 연타 방지는 FE에서
-        처리합니다.
-      operationId: reissueInviteCode
-      parameters:
-      - name: agitUuid
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ActorUserRequest"
-        required: true
-      responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ReissueInviteCodeResponse"
-  /api/v1/agits/{agitUuid}/members/{ampId}/transfer-host:
-    post:
-      tags:
-      - Agit
-      summary: 아지트장 위임
-      description: 아지트장이 ampId의 ACTIVE 게스트에게 방장 권한을 위임합니다. 성공 시 204를 반환합니다.
-      operationId: transferHost
-      parameters:
-      - name: agitUuid
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: ampId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ActorUserRequest"
-        required: true
-      responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "204":
-          description: No Content
   /api/v1/agits/{code}/join:
     post:
       tags:
@@ -231,8 +74,8 @@ paths:
               $ref: "#/components/schemas/JoinAgitRequest"
         required: true
       responses:
-        "403":
-          description: Forbidden
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -243,8 +86,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -289,8 +132,8 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "403":
-          description: Forbidden
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -301,8 +144,61 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "204":
+          description: No Content
+  /api/v1/agits/{agitUuid}/members/{ampId}/transfer-host:
+    post:
+      tags:
+      - Agit
+      summary: 아지트장 위임
+      description: 아지트장이 ampId의 ACTIVE 게스트에게 방장 권한을 위임합니다. 성공 시 204를 반환합니다.
+      operationId: transferHost
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: ampId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
         "409":
           description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -320,8 +216,8 @@ paths:
       tags:
       - Agit
       summary: 아지트에서 내보내기
-      description: 아지트장이 ampId로 멤버를 내보냅니다. status를 BANNED로 바꾸고 bans 이력을 남깁니다.
-        ACTIVE HOST는 내보낼 수 없습니다. 이미 BANNED인 경우 변경 없이 성공합니다.
+      description: 아지트장이 ampId로 멤버를 내보냅니다. status를 BANNED로 바꾸고 bans 이력을 남깁니다. ACTIVE
+        HOST는 내보낼 수 없습니다. 이미 BANNED인 경우 변경 없이 성공합니다.
       operationId: banMember
       parameters:
       - name: agitUuid
@@ -343,8 +239,8 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "403":
-          description: Forbidden
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -355,8 +251,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -391,8 +287,8 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "403":
-          description: Forbidden
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -403,8 +299,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -417,6 +313,160 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "204":
           description: No Content
+  /api/v1/agits/{agitUuid}/invite-code:
+    post:
+      tags:
+      - Agit
+      summary: 초대 코드 재발급
+      description: 아지트장이 초대 코드를 재발급합니다. 호출마다 새 코드를 반환합니다. 연타 방지는 FE에서 처리합니다.
+      operationId: reissueInviteCode
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReissueInviteCodeResponse"
+  /api/v1/agits/{agitUuid}:
+    patch:
+      tags:
+      - Agit
+      summary: 아지트 정보 변경
+      description: "아지트장이 제목·인원·소개글·섬네일을 수정합니다. 변경 인원수는 현재 ACTIVE 인원보다 작을 수 없으며, 그\
+        \ 외 검증은 생성과 동일합니다."
+      operationId: updateAgit
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAgitRequest"
+        required: true
+      responses:
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UpdateAgitResponse"
+  /api/v1/agits/{agitUuid}/members/me:
+    patch:
+      tags:
+      - Agit
+      summary: 내 아지트 프로필 수정
+      description: 접속 유저가 해당 아지트에서 ACTIVE인 본인 닉네임·프로필 이미지를 부분 수정합니다. 미전달 필드는 유지합니다.
+      operationId: updateMyMemberProfile
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMyMemberProfileRequest"
+        required: true
+      responses:
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UpdateMyMemberProfileResponse"
   /api/v1/agits/{code}/landing:
     get:
       tags:
@@ -431,8 +481,8 @@ paths:
         schema:
           type: string
       responses:
-        "403":
-          description: Forbidden
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -443,8 +493,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -461,14 +511,23 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AgitLandingResponse"
-  /api/test:
+  /api/v1/agits/me:
     get:
       tags:
-      - test-controller
-      operationId: test
+      - Agit
+      summary: 내 아지트 목록 조회
+      description: "접속 유저가 ACTIVE로 속한 아지트 목록(제목·UUID)을 반환합니다. 정렬은 agit.updated_at\
+        \ 내림차순(임시)이며, 이후 최근 토픽순으로 교체 예정입니다. userUuid는 임시로 request body로 받습니다."
+      operationId: listMyAgits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
       responses:
-        "403":
-          description: Forbidden
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -479,8 +538,46 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MyAgitItemResponse"
+  /api/test:
+    get:
+      tags:
+      - test-controller
+      operationId: test
+      responses:
         "409":
           description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -503,8 +600,8 @@ paths:
       - test-controller
       operationId: ping
       responses:
-        "403":
-          description: Forbidden
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -515,8 +612,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -691,6 +788,14 @@ components:
           format: uuid
           description: "요청자 사용자 UUID (UUIDv7, 임시 body 전달 — 추후 인증에서 추출)"
           example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+    ReissueInviteCodeResponse:
+      type: object
+      description: 초대 코드 재발급 응답
+      properties:
+        code:
+          type: string
+          description: 새로 발급된 초대 코드
+          example: AB12CD
     UpdateAgitRequest:
       type: object
       description: 아지트 정보 변경 요청
@@ -743,14 +848,35 @@ components:
           type: string
           description: 섬네일 경로
           example: agits/thumbnails/sample.png
-    ReissueInviteCodeResponse:
+    UpdateMyMemberProfileRequest:
       type: object
-      description: 초대 코드 재발급 응답
+      description: 내 아지트 멤버 프로필 수정 요청
       properties:
-        code:
+        userUuid:
           type: string
-          description: 새로 발급된 초대 코드
-          example: AB12CD
+          format: uuid
+          description: "요청자 사용자 UUID (UUIDv7, 임시 body 전달 — 추후 인증에서 추출)"
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        nickname:
+          type: string
+          description: "닉네임 (선택, 영문·숫자·한글 2~12자, 특수문자·공백 불가). 미전달 시 유지"
+          example: 보드왕
+        profileImagePath:
+          type: string
+          description: "프로필 이미지 경로 (선택). 미전달 시 유지, 빈 문자열이면 제거"
+          example: profiles/guest.png
+    UpdateMyMemberProfileResponse:
+      type: object
+      description: 내 아지트 멤버 프로필 수정 응답
+      properties:
+        nickname:
+          type: string
+          description: 닉네임
+          example: 보드왕
+        profileImagePath:
+          type: string
+          description: 프로필 이미지 경로
+          example: profiles/guest.png
     AgitLandingResponse:
       type: object
       description: 아지트 랜딩 조회 응답 (표시 전용)
@@ -781,3 +907,16 @@ components:
           type: string
           description: 섬네일 경로
           example: agits/thumbnails/sample.png
+    MyAgitItemResponse:
+      type: object
+      description: 내 아지트 목록 항목
+      properties:
+        agitUuid:
+          type: string
+          format: uuid
+          description: 아지트 UUID
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        agitName:
+          type: string
+          description: 아지트 제목
+          example: 주말 보드게임

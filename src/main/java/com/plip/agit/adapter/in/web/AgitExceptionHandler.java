@@ -4,6 +4,7 @@ import com.plip.agit.adapter.in.web.dto.ErrorResponse;
 import com.plip.agit.application.exception.AgitAlreadyJoinedException;
 import com.plip.agit.application.exception.AgitBannedException;
 import com.plip.agit.application.exception.AgitCapacityExceededException;
+import com.plip.agit.application.exception.AgitMemberNotActiveException;
 import com.plip.agit.application.exception.AgitMemberNotFoundException;
 import com.plip.agit.application.exception.AgitNotFoundException;
 import com.plip.agit.application.exception.CannotBanHostException;
@@ -52,6 +53,15 @@ public class AgitExceptionHandler {
 	public ErrorResponse handleAgitBanned(AgitBannedException ex) {
 		return ErrorResponse.builder()
 				.code("MEMBER_BANNED")
+				.message(ex.getMessage())
+				.build();
+	}
+
+	@ExceptionHandler(AgitMemberNotActiveException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ErrorResponse handleAgitMemberNotActive(AgitMemberNotActiveException ex) {
+		return ErrorResponse.builder()
+				.code("MEMBER_NOT_ACTIVE")
 				.message(ex.getMessage())
 				.build();
 	}

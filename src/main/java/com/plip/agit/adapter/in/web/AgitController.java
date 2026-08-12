@@ -6,9 +6,12 @@ import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
 import com.plip.agit.adapter.in.web.dto.JoinAgitRequest;
 import com.plip.agit.adapter.in.web.dto.JoinAgitResponse;
+import com.plip.agit.adapter.in.web.dto.MyAgitItemResponse;
 import com.plip.agit.adapter.in.web.dto.ReissueInviteCodeResponse;
 import com.plip.agit.adapter.in.web.dto.UpdateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.UpdateAgitResponse;
+import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileRequest;
+import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileResponse;
 import com.plip.agit.adapter.in.web.mapper.AgitWebMapper;
 import com.plip.agit.application.port.in.AgitUseCase;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
@@ -16,11 +19,15 @@ import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
 import com.plip.agit.application.port.in.dto.JoinAgitResultDto;
+import com.plip.agit.application.port.in.dto.MyAgitItemDto;
 import com.plip.agit.application.port.in.dto.ReissueInviteCodeResultDto;
 import com.plip.agit.application.port.in.dto.UpdateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.UpdateAgitResultDto;
+import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileRequestDto;
+import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -53,6 +60,19 @@ public class AgitController {
 		CreateAgitRequestDto requestDto = agitWebMapper.toDto(request);
 		CreateAgitResultDto resultDto = agitUseCase.createAgit(requestDto);
 		return agitWebMapper.toResponse(resultDto);
+	}
+
+	@Operation(
+			summary = "내 아지트 목록 조회",
+			description = "접속 유저가 ACTIVE로 속한 아지트 목록(제목·UUID)을 반환합니다. "
+					+ "정렬은 agit.updated_at 내림차순(임시)이며, 이후 최근 토픽순으로 교체 예정입니다. "
+					+ "userUuid는 임시로 request body로 받습니다."
+	)
+	@GetMapping("/me")
+	public List<MyAgitItemResponse> listMyAgits(@RequestBody ActorUserRequest request) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		List<MyAgitItemDto> resultDtos = agitUseCase.listMyAgits(request.getUserUuid());
+		return agitWebMapper.toMyAgitResponses(resultDtos);
 	}
 
 	@Operation(
@@ -94,6 +114,23 @@ public class AgitController {
 		UpdateAgitRequestDto requestDto = agitWebMapper.toUpdateDto(request);
 		UpdateAgitResultDto resultDto = agitUseCase.updateAgit(agitUuid, requestDto);
 		return agitWebMapper.toUpdateResponse(resultDto);
+	}
+
+	@Operation(
+			summary = "내 아지트 프로필 수정",
+			description = "접속 유저가 해당 아지트에서 ACTIVE인 본인 닉네임·프로필 이미지를 부분 수정합니다. "
+					+ "미전달 필드는 유지합니다."
+	)
+	@PatchMapping("/{agitUuid}/members/me")
+	public UpdateMyMemberProfileResponse updateMyMemberProfile(
+			@PathVariable UUID agitUuid,
+			@RequestBody UpdateMyMemberProfileRequest request
+	) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		UpdateMyMemberProfileRequestDto requestDto = agitWebMapper.toUpdateMyProfileDto(request);
+		UpdateMyMemberProfileResultDto resultDto =
+				agitUseCase.updateMyMemberProfile(agitUuid, requestDto);
+		return agitWebMapper.toUpdateMyProfileResponse(resultDto);
 	}
 
 	@Operation(
