@@ -6,7 +6,12 @@ import com.plip.agit.application.exception.AgitBannedException;
 import com.plip.agit.application.exception.AgitCapacityExceededException;
 import com.plip.agit.application.exception.AgitMemberNotFoundException;
 import com.plip.agit.application.exception.AgitNotFoundException;
+import com.plip.agit.application.exception.CannotBanHostException;
+import com.plip.agit.application.exception.CapacityBelowCurrentException;
+import com.plip.agit.application.exception.HostCannotLeaveException;
 import com.plip.agit.application.exception.InvalidInviteCodeException;
+import com.plip.agit.application.exception.InvalidTransferTargetException;
+import com.plip.agit.application.exception.NotAgitHostException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -51,6 +56,15 @@ public class AgitExceptionHandler {
 				.build();
 	}
 
+	@ExceptionHandler(NotAgitHostException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ErrorResponse handleNotAgitHost(NotAgitHostException ex) {
+		return ErrorResponse.builder()
+				.code("NOT_HOST")
+				.message(ex.getMessage())
+				.build();
+	}
+
 	@ExceptionHandler(AgitAlreadyJoinedException.class)
 	@ResponseStatus(HttpStatus.CONFLICT)
 	public ErrorResponse handleAgitAlreadyJoined(AgitAlreadyJoinedException ex) {
@@ -66,6 +80,42 @@ public class AgitExceptionHandler {
 	public ErrorResponse handleAgitCapacityExceeded(AgitCapacityExceededException ex) {
 		return ErrorResponse.builder()
 				.code("CAPACITY_FULL")
+				.message(ex.getMessage())
+				.build();
+	}
+
+	@ExceptionHandler(CapacityBelowCurrentException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleCapacityBelowCurrent(CapacityBelowCurrentException ex) {
+		return ErrorResponse.builder()
+				.code("CAPACITY_BELOW_CURRENT")
+				.message(ex.getMessage())
+				.build();
+	}
+
+	@ExceptionHandler(InvalidTransferTargetException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ErrorResponse handleInvalidTransferTarget(InvalidTransferTargetException ex) {
+		return ErrorResponse.builder()
+				.code("INVALID_TRANSFER_TARGET")
+				.message(ex.getMessage())
+				.build();
+	}
+
+	@ExceptionHandler(CannotBanHostException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ErrorResponse handleCannotBanHost(CannotBanHostException ex) {
+		return ErrorResponse.builder()
+				.code("CANNOT_BAN_HOST")
+				.message(ex.getMessage())
+				.build();
+	}
+
+	@ExceptionHandler(HostCannotLeaveException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ErrorResponse handleHostCannotLeave(HostCannotLeaveException ex) {
+		return ErrorResponse.builder()
+				.code("HOST_CANNOT_LEAVE")
 				.message(ex.getMessage())
 				.build();
 	}

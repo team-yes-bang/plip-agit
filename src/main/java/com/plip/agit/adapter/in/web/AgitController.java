@@ -6,6 +6,9 @@ import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
 import com.plip.agit.adapter.in.web.dto.JoinAgitRequest;
 import com.plip.agit.adapter.in.web.dto.JoinAgitResponse;
+import com.plip.agit.adapter.in.web.dto.ReissueInviteCodeResponse;
+import com.plip.agit.adapter.in.web.dto.UpdateAgitRequest;
+import com.plip.agit.adapter.in.web.dto.UpdateAgitResponse;
 import com.plip.agit.adapter.in.web.mapper.AgitWebMapper;
 import com.plip.agit.application.port.in.AgitUseCase;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
@@ -13,12 +16,16 @@ import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
 import com.plip.agit.application.port.in.dto.JoinAgitResultDto;
+import com.plip.agit.application.port.in.dto.ReissueInviteCodeResultDto;
+import com.plip.agit.application.port.in.dto.UpdateAgitRequestDto;
+import com.plip.agit.application.port.in.dto.UpdateAgitResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -75,8 +82,52 @@ public class AgitController {
 	}
 
 	@Operation(
+			summary = "아지트 정보 변경",
+			description = "아지트장이 제목·인원·소개글·섬네일을 수정합니다. 변경 인원수는 현재 ACTIVE 인원보다 작을 수 없으며, 그 외 검증은 생성과 동일합니다."
+	)
+	@PatchMapping("/{agitUuid}")
+	public UpdateAgitResponse updateAgit(
+			@PathVariable UUID agitUuid,
+			@RequestBody UpdateAgitRequest request
+	) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		UpdateAgitRequestDto requestDto = agitWebMapper.toUpdateDto(request);
+		UpdateAgitResultDto resultDto = agitUseCase.updateAgit(agitUuid, requestDto);
+		return agitWebMapper.toUpdateResponse(resultDto);
+	}
+
+	@Operation(
+			summary = "아지트장 위임",
+			description = "아지트장이 ampId의 ACTIVE 게스트에게 방장 권한을 위임합니다. 성공 시 204를 반환합니다."
+	)
+	@PostMapping("/{agitUuid}/members/{ampId}/transfer-host")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void transferHost(
+			@PathVariable UUID agitUuid,
+			@PathVariable Long ampId,
+			@RequestBody ActorUserRequest request
+	) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		agitUseCase.transferHost(agitUuid, ampId, request.getUserUuid());
+	}
+
+	@Operation(
+			summary = "초대 코드 재발급",
+			description = "아지트장이 초대 코드를 재발급합니다. 호출마다 새 코드를 반환합니다. 연타 방지는 FE에서 처리합니다."
+	)
+	@PostMapping("/{agitUuid}/invite-code")
+	public ReissueInviteCodeResponse reissueInviteCode(
+			@PathVariable UUID agitUuid,
+			@RequestBody ActorUserRequest request
+	) {
+		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		ReissueInviteCodeResultDto resultDto = agitUseCase.reissueInviteCode(agitUuid, request.getUserUuid());
+		return agitWebMapper.toReissueResponse(resultDto);
+	}
+
+	@Operation(
 			summary = "아지트에서 내보내기",
-			description = "아지트장이 ampId로 멤버를 내보냅니다. status를 BANNED로 바꾸고 bans 이력을 남깁니다. 이미 BANNED인 경우 변경 없이 성공합니다."
+			description = "아지트장이 ampId로 멤버를 내보냅니다. status를 BANNED로 바꾸고 bans 이력을 남깁니다. ACTIVE HOST는 내보낼 수 없습니다. 이미 BANNED인 경우 변경 없이 성공합니다."
 	)
 	@PostMapping("/{agitUuid}/members/{ampId}/ban")
 	@ResponseStatus(HttpStatus.NO_CONTENT)

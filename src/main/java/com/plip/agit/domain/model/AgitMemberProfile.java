@@ -140,6 +140,26 @@ public class AgitMemberProfile {
 		this.status = AgitMemberStatus.ACTIVE;
 	}
 
+	/**
+	 * 방장 위임: ACTIVE HOST만 GUEST로 강등한다.
+	 */
+	public void demoteToGuest() {
+		if (this.status != AgitMemberStatus.ACTIVE || this.role != AgitMemberRole.HOST) {
+			throw new IllegalStateException("ACTIVE 아지트장만 역할을 넘길 수 있습니다.");
+		}
+		this.role = AgitMemberRole.GUEST;
+	}
+
+	/**
+	 * 방장 위임: ACTIVE GUEST만 HOST로 승격한다.
+	 */
+	public void promoteToHost() {
+		if (this.status != AgitMemberStatus.ACTIVE || this.role != AgitMemberRole.GUEST) {
+			throw new IllegalStateException("ACTIVE 게스트만 아지트장이 될 수 있습니다.");
+		}
+		this.role = AgitMemberRole.HOST;
+	}
+
 	private static String requireNickname(String nickname) {
 		if (nickname == null || nickname.isBlank()) {
 			throw new IllegalArgumentException("닉네임은 필수입니다.");

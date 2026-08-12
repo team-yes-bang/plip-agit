@@ -53,6 +53,163 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CreateAgitResponse"
+  /api/v1/agits/{agitUuid}:
+    patch:
+      tags:
+      - Agit
+      summary: 아지트 정보 변경
+      description: 아지트장이 제목·인원·소개글·섬네일을 수정합니다. 변경 인원수는 현재 ACTIVE 인원보다
+        작을 수 없으며, 그 외 검증은 생성과 동일합니다.
+      operationId: updateAgit
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAgitRequest"
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UpdateAgitResponse"
+  /api/v1/agits/{agitUuid}/invite-code:
+    post:
+      tags:
+      - Agit
+      summary: 초대 코드 재발급
+      description: 아지트장이 초대 코드를 재발급합니다. 호출마다 새 코드를 반환합니다. 연타 방지는 FE에서
+        처리합니다.
+      operationId: reissueInviteCode
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReissueInviteCodeResponse"
+  /api/v1/agits/{agitUuid}/members/{ampId}/transfer-host:
+    post:
+      tags:
+      - Agit
+      summary: 아지트장 위임
+      description: 아지트장이 ampId의 ACTIVE 게스트에게 방장 권한을 위임합니다. 성공 시 204를 반환합니다.
+      operationId: transferHost
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: ampId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "204":
+          description: No Content
   /api/v1/agits/{code}/join:
     post:
       tags:
@@ -163,8 +320,8 @@ paths:
       tags:
       - Agit
       summary: 아지트에서 내보내기
-      description: 아지트장이 ampId로 멤버를 내보냅니다. status를 BANNED로 바꾸고 bans 이력을 남깁니다. 이미 BANNED인
-        경우 변경 없이 성공합니다.
+      description: 아지트장이 ampId로 멤버를 내보냅니다. status를 BANNED로 바꾸고 bans 이력을 남깁니다.
+        ACTIVE HOST는 내보낼 수 없습니다. 이미 BANNED인 경우 변경 없이 성공합니다.
       operationId: banMember
       parameters:
       - name: agitUuid
@@ -534,6 +691,66 @@ components:
           format: uuid
           description: "요청자 사용자 UUID (UUIDv7, 임시 body 전달 — 추후 인증에서 추출)"
           example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+    UpdateAgitRequest:
+      type: object
+      description: 아지트 정보 변경 요청
+      properties:
+        userUuid:
+          type: string
+          format: uuid
+          description: "요청자 사용자 UUID (UUIDv7, 임시 body 전달 — 추후 인증에서 추출)"
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        agitName:
+          type: string
+          description: "아지트 제목 (필수, 최대 20자)"
+          example: 주말 보드게임
+        description:
+          type: string
+          description: "소개글 (선택, 최대 100자)"
+          example: 가볍게 즐겨요
+        maximumCapacity:
+          type: integer
+          format: int32
+          description: "최대 인원 (필수, 기본 허용 상한 5, 현재 ACTIVE 인원 이상)"
+          example: 5
+        thumbnailPath:
+          type: string
+          description: "섬네일 경로 (선택, 최대 255자)"
+          example: agits/thumbnails/sample.png
+    UpdateAgitResponse:
+      type: object
+      description: 아지트 정보 변경 응답
+      properties:
+        agitUuid:
+          type: string
+          format: uuid
+          description: 아지트 UUID
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        agitName:
+          type: string
+          description: 아지트 제목
+          example: 주말 보드게임
+        description:
+          type: string
+          description: 소개글
+          example: 가볍게 즐겨요
+        maximumCapacity:
+          type: integer
+          format: int32
+          description: 최대 인원
+          example: 5
+        thumbnailPath:
+          type: string
+          description: 섬네일 경로
+          example: agits/thumbnails/sample.png
+    ReissueInviteCodeResponse:
+      type: object
+      description: 초대 코드 재발급 응답
+      properties:
+        code:
+          type: string
+          description: 새로 발급된 초대 코드
+          example: AB12CD
     AgitLandingResponse:
       type: object
       description: 아지트 랜딩 조회 응답 (표시 전용)

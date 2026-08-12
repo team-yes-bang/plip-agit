@@ -81,6 +81,25 @@ public class Agit {
 				.build();
 	}
 
+	/**
+	 * 아지트 메타(제목·소개·정원·섬네일)를 갱신한다. 생성 시와 동일한 검증 규칙을 적용한다.
+	 *
+	 * @param allowedMaxCapacity 아이템 보유 여부 등을 유스케이스에서 판정한 허용 최대 인원
+	 */
+	public void updateMeta(
+			String agitName,
+			String description,
+			Integer maximumCapacity,
+			String thumbnailPath,
+			int allowedMaxCapacity
+	) {
+		ensureActive();
+		this.agitName = requireName(agitName);
+		this.description = normalizeDescription(description);
+		this.maximumCapacity = requireCapacity(maximumCapacity, allowedMaxCapacity);
+		this.thumbnailPath = normalizeThumbnailPath(thumbnailPath);
+	}
+
 	public void reissueCode(String newCode) {
 		ensureActive();
 		this.code = requireCode(newCode);

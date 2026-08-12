@@ -5,13 +5,21 @@ import com.plip.agit.application.exception.AgitBannedException;
 import com.plip.agit.application.exception.AgitCapacityExceededException;
 import com.plip.agit.application.exception.AgitMemberNotFoundException;
 import com.plip.agit.application.exception.AgitNotFoundException;
+import com.plip.agit.application.exception.CannotBanHostException;
+import com.plip.agit.application.exception.CapacityBelowCurrentException;
+import com.plip.agit.application.exception.HostCannotLeaveException;
 import com.plip.agit.application.exception.InvalidInviteCodeException;
+import com.plip.agit.application.exception.InvalidTransferTargetException;
+import com.plip.agit.application.exception.NotAgitHostException;
 import com.plip.agit.application.port.in.AgitUseCase;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
 import com.plip.agit.application.port.in.dto.JoinAgitResultDto;
+import com.plip.agit.application.port.in.dto.ReissueInviteCodeResultDto;
+import com.plip.agit.application.port.in.dto.UpdateAgitRequestDto;
+import com.plip.agit.application.port.in.dto.UpdateAgitResultDto;
 import com.plip.agit.application.port.out.AgitBanPersistencePort;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
@@ -205,6 +213,10 @@ public class AgitService implements AgitUseCase {
 			return;
 		}
 
+		if (target.getRole() == AgitMemberRole.HOST && target.getStatus() == AgitMemberStatus.ACTIVE) {
+			throw new CannotBanHostException();
+		}
+
 		target.ban();
 		agitMemberProfilePersistencePort.save(target);
 
@@ -241,7 +253,7 @@ public class AgitService implements AgitUseCase {
 		if (profile.getRole() == AgitMemberRole.HOST) {
 			long activeCount = agitMemberProfilePersistencePort.countActiveByAgitId(agit.getId());
 			if (activeCount != 1) {
-				throw new IllegalStateException("방장은 다른 ACTIVE 멤버가 없을 때만 나갈 수 있습니다.");
+				throw new HostCannotLeaveException();
 			}
 			profile.leave();
 			agitMemberProfilePersistencePort.save(profile);
@@ -292,6 +304,104 @@ public class AgitService implements AgitUseCase {
 		agitMemberProfilePersistencePort.save(profile);
 	}
 
+	/**
+	 * 아지트 메타(제목·소개·정원·섬네일)를 수정한다. 생성 검증과 동일하며, 정원은 현재 ACTIVE 인원 이상이어야 한다.
+	 *
+	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
+	 * TODO(side-effect): 메타 수정 후 document/캐시 갱신 및 AgitUpdated 이벤트 발행.
+	 */
+	@Override
+	@Transactional
+	public UpdateAgitResultDto updateAgit(UUID agitUuid, UpdateAgitRequestDto requestDto) {
+		requireActorUserUuid(requestDto.getUserUuid());
+
+		Agit agit = requireActiveAgit(agitUuid);
+		requireActiveHost(agit.getId(), requestDto.getUserUuid());
+
+		long currentMemberCount = agitMemberProfilePersistencePort.countActiveByAgitId(agit.getId());
+		if (requestDto.getMaximumCapacity() != null
+				&& requestDto.getMaximumCapacity() < currentMemberCount) {
+			throw new CapacityBelowCurrentException(currentMemberCount);
+		}
+
+		agit.updateMeta(
+				requestDto.getAgitName(),
+				requestDto.getDescription(),
+				requestDto.getMaximumCapacity(),
+				requestDto.getThumbnailPath(),
+				resolveAllowedMaxCapacity()
+		);
+		Agit saved = agitPersistencePort.save(agit);
+
+		return UpdateAgitResultDto.builder()
+				.agitUuid(saved.getAgitUuid())
+				.agitName(saved.getAgitName())
+				.description(saved.getDescription())
+				.maximumCapacity(saved.getMaximumCapacity())
+				.thumbnailPath(saved.getThumbnailPath())
+				.build();
+	}
+
+	/**
+	 * 아지트장 권한을 ACTIVE GUEST(ampId)에게 위임한다.
+	 *
+	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
+	 * TODO(side-effect): 위임 후 document hostNickname/캐시 갱신 및 HostTransferred 이벤트 발행.
+	 */
+	@Override
+	@Transactional
+	public void transferHost(UUID agitUuid, Long ampId, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+		if (ampId == null) {
+			throw new IllegalArgumentException("멤버 프로필 ID는 필수입니다.");
+		}
+
+		Agit agit = requireActiveAgit(agitUuid);
+		AgitMemberProfile currentHost = requireActiveHost(agit.getId(), actorUserUuid);
+
+		if (ampId.equals(currentHost.getId())) {
+			throw new IllegalArgumentException("자기 자신에게 방장을 위임할 수 없습니다.");
+		}
+
+		AgitMemberProfile target = agitMemberProfilePersistencePort.findById(ampId)
+				.orElseThrow(AgitMemberNotFoundException::new);
+		if (!agit.getId().equals(target.getAgitId())) {
+			throw new AgitMemberNotFoundException();
+		}
+		if (target.getStatus() != AgitMemberStatus.ACTIVE
+				|| target.getRole() != AgitMemberRole.GUEST) {
+			throw new InvalidTransferTargetException();
+		}
+
+		currentHost.demoteToGuest();
+		target.promoteToHost();
+		agitMemberProfilePersistencePort.save(currentHost);
+		agitMemberProfilePersistencePort.save(target);
+	}
+
+	/**
+	 * 초대 코드를 재발급한다. 호출마다 새 코드를 발급한다. 연타 방지는 FE에서 처리한다.
+	 *
+	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
+	 * TODO(side-effect): 재발급 후 구 code 캐시 무효화·신 code document 갱신 및 InviteCodeReissued 이벤트 발행.
+	 */
+	@Override
+	@Transactional
+	public ReissueInviteCodeResultDto reissueInviteCode(UUID agitUuid, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+
+		Agit agit = requireActiveAgit(agitUuid);
+		requireActiveHost(agit.getId(), actorUserUuid);
+
+		String newCode = generateUniqueCode();
+		agit.reissueCode(newCode);
+		Agit saved = agitPersistencePort.save(agit);
+
+		return ReissueInviteCodeResultDto.builder()
+				.code(saved.getCode())
+				.build();
+	}
+
 	private Agit requireActiveAgit(UUID agitUuid) {
 		if (agitUuid == null) {
 			throw new IllegalArgumentException("아지트 UUID는 필수입니다.");
@@ -307,9 +417,9 @@ public class AgitService implements AgitUseCase {
 	private AgitMemberProfile requireActiveHost(Long agitId, UUID actorUserUuid) {
 		AgitMemberProfile actor = agitMemberProfilePersistencePort
 				.findByAgitIdAndUserUuid(agitId, actorUserUuid)
-				.orElseThrow(() -> new IllegalStateException("아지트장만 수행할 수 있습니다."));
+				.orElseThrow(NotAgitHostException::new);
 		if (actor.getRole() != AgitMemberRole.HOST || actor.getStatus() != AgitMemberStatus.ACTIVE) {
-			throw new IllegalStateException("아지트장만 수행할 수 있습니다.");
+			throw new NotAgitHostException();
 		}
 		return actor;
 	}
