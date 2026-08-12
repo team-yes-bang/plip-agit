@@ -31,6 +31,7 @@ public class AgitMemberProfilePersistenceAdapter implements AgitMemberProfilePer
 		agitMemberProfileRepository.updateMembershipById(
 				profile.getId(),
 				agitMemberProfileEntityMapper.toEntityStatus(profile.getStatus()),
+				agitMemberProfileEntityMapper.toEntityRole(profile.getRole()),
 				profile.getNickname(),
 				profile.getProfileImagePath(),
 				LocalDateTime.now()

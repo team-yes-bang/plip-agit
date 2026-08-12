@@ -26,6 +26,7 @@ public interface AgitMemberProfileRepository extends JpaRepository<AgitMemberPro
 	@Query("""
 			UPDATE AgitMemberProfileEntity p
 			   SET p.status = :status,
+			       p.role = :role,
 			       p.nickname = :nickname,
 			       p.profileImagePath = :profileImagePath,
 			       p.updatedAt = :updatedAt
@@ -34,6 +35,7 @@ public interface AgitMemberProfileRepository extends JpaRepository<AgitMemberPro
 	int updateMembershipById(
 			@Param("id") Long id,
 			@Param("status") AgitMemberStatus status,
+			@Param("role") AgitMemberRole role,
 			@Param("nickname") String nickname,
 			@Param("profileImagePath") String profileImagePath,
 			@Param("updatedAt") LocalDateTime updatedAt
