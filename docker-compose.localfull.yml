@@ -1,0 +1,27 @@
+# 로컬 통합 실행: MySQL + agit (IDE bootRun 대신 Docker로 전체 스택 확인)
+# 사용: docker compose -f docker-compose.localfull.yml up -d --build
+include:
+  - path: docker-compose.yml
+  - path: docker-compose.app.yml
+
+networks:
+  plip-net:
+    driver: bridge
+
+services:
+  mysql:
+    container_name: plip-agit-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-plip_agit}
+    networks:
+      - plip-net
+
+  agit:
+    depends_on: !reset
+      mysql:
+        condition: service_healthy
+    environment:
+      EUREKA_CLIENT_ENABLED: "false"
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-plip_agit}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
