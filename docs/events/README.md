@@ -14,3 +14,6 @@
 #   agit.host-transferred.v1.md
 #   agit.invite-code-reissued.v1.md
 #   agit.member-profile-updated.v1.md
+#   topic.bound.v1.md
+#   topic.unbound.v1.md
+#   topic.started.v1.md
