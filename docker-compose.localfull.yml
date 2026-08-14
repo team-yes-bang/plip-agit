@@ -16,12 +16,20 @@ services:
     networks:
       - plip-net
 
+  kafka:
+    container_name: plip-agit-kafka
+    networks:
+      - plip-net
+
   agit:
     depends_on: !reset
       mysql:
         condition: service_healthy
+      kafka:
+        condition: service_started
     environment:
       EUREKA_CLIENT_ENABLED: "false"
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-plip_agit}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "${SERVER_PORT:-8080}:8080"
