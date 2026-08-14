@@ -71,6 +71,7 @@ class AgitServiceLandingTest {
 						new AgitReadMemberSnapshot(hostUuid, "보드왕", null, AgitMemberRole.HOST),
 						new AgitReadMemberSnapshot(UUID.randomUUID(), "게스트", null, AgitMemberRole.GUEST)
 				),
+				List.of(),
 				Instant.parse("2026-08-14T00:00:00Z")
 		);
 		when(agitReadPersistencePort.findActiveByCode("A1B2C3")).thenReturn(Optional.of(snapshot));
@@ -128,6 +129,7 @@ class AgitServiceLandingTest {
 				List.of(new AgitReadMemberSnapshot(
 						UUID.randomUUID(), "게스트", null, AgitMemberRole.GUEST
 				)),
+				List.of(),
 				Instant.parse("2026-08-14T00:00:00Z")
 		);
 		when(agitReadPersistencePort.findActiveByCode("A1B2C3")).thenReturn(Optional.of(snapshot));

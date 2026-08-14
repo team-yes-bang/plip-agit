@@ -1,12 +1,14 @@
 package com.plip.agit.application.service;
 
 import com.plip.agit.application.port.in.BackfillAgitReadModelsUseCase;
+import com.plip.agit.application.port.in.ProjectAgitBoundTopicUseCase;
 import com.plip.agit.application.port.in.RefreshAgitReadModelUseCase;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
 import com.plip.agit.application.port.out.AgitReadMemberSnapshot;
 import com.plip.agit.application.port.out.AgitReadPersistencePort;
 import com.plip.agit.application.port.out.AgitReadSnapshot;
+import com.plip.agit.application.port.out.AgitReadTopicSnapshot;
 import com.plip.agit.domain.model.Agit;
 import com.plip.agit.domain.model.AgitMemberProfile;
 import java.time.Instant;
@@ -22,7 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AgitReadModelService implements RefreshAgitReadModelUseCase, BackfillAgitReadModelsUseCase {
+public class AgitReadModelService
+		implements RefreshAgitReadModelUseCase, BackfillAgitReadModelsUseCase, ProjectAgitBoundTopicUseCase {
 
 	private final AgitPersistencePort agitPersistencePort;
 	private final AgitMemberProfilePersistencePort agitMemberProfilePersistencePort;
@@ -48,12 +51,47 @@ public class AgitReadModelService implements RefreshAgitReadModelUseCase, Backfi
 		log.info("아지트 읽기 모델 백필 완료 count={}", agits.size());
 	}
 
+	@Override
+	public void bind(UUID agitUuid, String topicId, Instant startedAt) {
+		boolean applied = agitReadPersistencePort.upsertTopic(
+				agitUuid, new AgitReadTopicSnapshot(topicId, startedAt)
+		);
+		if (!applied) {
+			log.warn("묶인 토픽 투영 skip: 읽기 문서 없음 agitUuid={} topicId={}", agitUuid, topicId);
+		}
+	}
+
+	@Override
+	public void unbind(UUID agitUuid, String topicId) {
+		boolean applied = agitReadPersistencePort.removeTopic(agitUuid, topicId);
+		if (!applied) {
+			log.warn("토픽 해제 투영 skip: 읽기 문서 없음 agitUuid={} topicId={}", agitUuid, topicId);
+		}
+	}
+
+	@Override
+	public void start(UUID agitUuid, String topicId, Instant startedAt) {
+		if (startedAt == null) {
+			log.warn("토픽 시작 투영 skip: startedAt 없음 agitUuid={} topicId={}", agitUuid, topicId);
+			return;
+		}
+		boolean applied = agitReadPersistencePort.upsertTopic(
+				agitUuid, new AgitReadTopicSnapshot(topicId, startedAt)
+		);
+		if (!applied) {
+			log.warn("토픽 시작 투영 skip: 읽기 문서 없음 agitUuid={} topicId={}", agitUuid, topicId);
+		}
+	}
+
 	private void replaceFromMysql(Agit agit) {
 		List<AgitReadMemberSnapshot> members = agitMemberProfilePersistencePort
 				.findActiveByAgitId(agit.getId())
 				.stream()
 				.map(this::toMemberSnapshot)
 				.toList();
+		List<AgitReadTopicSnapshot> topics = agitReadPersistencePort.findByAgitUuid(agit.getAgitUuid())
+				.map(AgitReadSnapshot::topics)
+				.orElse(List.of());
 		agitReadPersistencePort.replace(new AgitReadSnapshot(
 				agit.getAgitUuid(),
 				agit.getAgitName(),
@@ -63,6 +101,7 @@ public class AgitReadModelService implements RefreshAgitReadModelUseCase, Backfi
 				agit.getStatus(),
 				agit.getMaximumCapacity(),
 				members,
+				topics,
 				Instant.now()
 		));
 	}

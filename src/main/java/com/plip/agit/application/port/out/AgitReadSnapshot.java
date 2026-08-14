@@ -14,6 +14,7 @@ public record AgitReadSnapshot(
 		AgitStatus status,
 		int maximumCapacity,
 		List<AgitReadMemberSnapshot> members,
+		List<AgitReadTopicSnapshot> topics,
 		Instant updatedAt
 ) {
 }
