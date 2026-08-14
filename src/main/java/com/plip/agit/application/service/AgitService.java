@@ -1,5 +1,7 @@
 package com.plip.agit.application.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.plip.agit.application.exception.AgitAlreadyJoinedException;
 import com.plip.agit.application.exception.AgitBannedException;
 import com.plip.agit.application.exception.AgitCapacityExceededException;
@@ -26,8 +28,10 @@ import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileRequestDto;
 import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileResultDto;
 import com.plip.agit.application.port.out.ActiveMembershipAgit;
 import com.plip.agit.application.port.out.AgitBanPersistencePort;
+import com.plip.agit.application.port.out.AgitEventTopics;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
+import com.plip.agit.application.port.out.EventPublisherPort;
 import com.plip.agit.domain.model.Agit;
 import com.plip.agit.domain.model.AgitBan;
 import com.plip.agit.domain.model.AgitMemberProfile;
@@ -36,14 +40,18 @@ import com.plip.agit.domain.model.AgitMemberStatus;
 import com.plip.agit.domain.model.AgitStatus;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -56,6 +64,8 @@ public class AgitService implements AgitUseCase {
 	private final AgitPersistencePort agitPersistencePort;
 	private final AgitMemberProfilePersistencePort agitMemberProfilePersistencePort;
 	private final AgitBanPersistencePort agitBanPersistencePort;
+	private final EventPublisherPort eventPublisherPort;
+	private final ObjectMapper objectMapper;
 	private final SecureRandom secureRandom = new SecureRandom();
 
 	@Override
@@ -86,6 +96,17 @@ public class AgitService implements AgitUseCase {
 				requestDto.getProfileImagePath()
 		);
 		AgitMemberProfile savedProfile = agitMemberProfilePersistencePort.save(hostProfile);
+
+		Map<String, Object> payload = new LinkedHashMap<>();
+		payload.put("agitUuid", savedAgit.getAgitUuid().toString());
+		payload.put("agitName", savedAgit.getAgitName());
+		payload.put("description", savedAgit.getDescription());
+		payload.put("maximumCapacity", savedAgit.getMaximumCapacity());
+		payload.put("code", savedAgit.getCode());
+		payload.put("thumbnailPath", savedAgit.getThumbnailPath());
+		payload.put("hostUserUuid", savedProfile.getUserUuid().toString());
+		payload.put("hostNickname", savedProfile.getNickname());
+		publishEvent(AgitEventTopics.CREATED, savedAgit.getAgitUuid(), payload);
 
 		return CreateAgitResultDto.builder()
 				.agitUuid(savedAgit.getAgitUuid())
@@ -139,7 +160,7 @@ public class AgitService implements AgitUseCase {
 	 * 초대 코드로 아지트에 입장한다. 신규는 GUEST INSERT, LEFT는 닉네임·이미지 갱신 후 ACTIVE.
 	 *
 	 * <p>TODO(auth): userUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(side-effect): join 후 document/캐시 갱신 및 MemberJoined 이벤트 발행.
+	 * TODO(side-effect): join 후 document/캐시 갱신.
 	 */
 	@Override
 	@Transactional
@@ -183,6 +204,14 @@ public class AgitService implements AgitUseCase {
 			savedProfile = agitMemberProfilePersistencePort.save(profile);
 		}
 
+		Map<String, Object> joinPayload = new LinkedHashMap<>();
+		joinPayload.put("agitUuid", agit.getAgitUuid().toString());
+		joinPayload.put("userUuid", savedProfile.getUserUuid().toString());
+		joinPayload.put("nickname", savedProfile.getNickname());
+		joinPayload.put("profileImagePath", savedProfile.getProfileImagePath());
+		joinPayload.put("role", savedProfile.getRole().name());
+		publishEvent(AgitEventTopics.MEMBER_JOINED, agit.getAgitUuid(), joinPayload);
+
 		return JoinAgitResultDto.builder()
 				.agitUuid(agit.getAgitUuid())
 				.ampId(savedProfile.getId())
@@ -196,7 +225,7 @@ public class AgitService implements AgitUseCase {
 	 * 아지트장이 멤버를 내보낸다. ampId로 대상을 찾고, 이후 식별은 userUuid.
 	 *
 	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(side-effect): ban 후 document/캐시 갱신 및 MemberBanned 이벤트 발행.
+	 * TODO(side-effect): ban 후 document/캐시 갱신.
 	 */
 	@Override
 	@Transactional
@@ -233,13 +262,19 @@ public class AgitService implements AgitUseCase {
 				target.getNickname()
 		);
 		agitBanPersistencePort.save(ban);
+
+		Map<String, Object> banPayload = new LinkedHashMap<>();
+		banPayload.put("agitUuid", agit.getAgitUuid().toString());
+		banPayload.put("userUuid", target.getUserUuid().toString());
+		banPayload.put("nickname", target.getNickname());
+		publishEvent(AgitEventTopics.MEMBER_BANNED, agit.getAgitUuid(), banPayload);
 	}
 
 	/**
 	 * 아지트에서 나간다. HOST는 ACTIVE 인원이 본인 1명일 때만 가능하며, 이때 아지트를 소프트 삭제한다.
 	 *
 	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(side-effect): leave/삭제 후 document/캐시 갱신 및 이벤트 발행.
+	 * TODO(side-effect): leave/삭제 후 document/캐시 갱신.
 	 */
 	@Override
 	@Transactional
@@ -265,18 +300,28 @@ public class AgitService implements AgitUseCase {
 			agitMemberProfilePersistencePort.save(profile);
 			agit.delete();
 			agitPersistencePort.save(agit);
+
+			Map<String, Object> deletedPayload = new LinkedHashMap<>();
+			deletedPayload.put("agitUuid", agit.getAgitUuid().toString());
+			deletedPayload.put("userUuid", actorUserUuid.toString());
+			publishEvent(AgitEventTopics.DELETED, agit.getAgitUuid(), deletedPayload);
 			return;
 		}
 
 		profile.leave();
 		agitMemberProfilePersistencePort.save(profile);
+
+		Map<String, Object> leftPayload = new LinkedHashMap<>();
+		leftPayload.put("agitUuid", agit.getAgitUuid().toString());
+		leftPayload.put("userUuid", actorUserUuid.toString());
+		publishEvent(AgitEventTopics.MEMBER_LEFT, agit.getAgitUuid(), leftPayload);
 	}
 
 	/**
 	 * 밴을 해제한다. 성공 시 profile status는 항상 LEFT(멱등).
 	 *
 	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(side-effect): unban 후 document/캐시 갱신 및 MemberUnbanned 이벤트 발행.
+	 * TODO(side-effect): unban 후 document/캐시 갱신.
 	 */
 	@Override
 	@Transactional
@@ -308,13 +353,18 @@ public class AgitService implements AgitUseCase {
 
 		profile.unbanToLeft();
 		agitMemberProfilePersistencePort.save(profile);
+
+		Map<String, Object> unbanPayload = new LinkedHashMap<>();
+		unbanPayload.put("agitUuid", agit.getAgitUuid().toString());
+		unbanPayload.put("userUuid", targetUserUuid.toString());
+		publishEvent(AgitEventTopics.MEMBER_UNBANNED, agit.getAgitUuid(), unbanPayload);
 	}
 
 	/**
 	 * 아지트 메타(제목·소개·정원·섬네일)를 수정한다. 생성 검증과 동일하며, 정원은 현재 ACTIVE 인원 이상이어야 한다.
 	 *
 	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(side-effect): 메타 수정 후 document/캐시 갱신 및 AgitUpdated 이벤트 발행.
+	 * TODO(side-effect): 메타 수정 후 document/캐시 갱신.
 	 */
 	@Override
 	@Transactional
@@ -339,6 +389,14 @@ public class AgitService implements AgitUseCase {
 		);
 		Agit saved = agitPersistencePort.save(agit);
 
+		Map<String, Object> updatedPayload = new LinkedHashMap<>();
+		updatedPayload.put("agitUuid", saved.getAgitUuid().toString());
+		updatedPayload.put("agitName", saved.getAgitName());
+		updatedPayload.put("description", saved.getDescription());
+		updatedPayload.put("maximumCapacity", saved.getMaximumCapacity());
+		updatedPayload.put("thumbnailPath", saved.getThumbnailPath());
+		publishEvent(AgitEventTopics.UPDATED, saved.getAgitUuid(), updatedPayload);
+
 		return UpdateAgitResultDto.builder()
 				.agitUuid(saved.getAgitUuid())
 				.agitName(saved.getAgitName())
@@ -352,7 +410,7 @@ public class AgitService implements AgitUseCase {
 	 * 아지트장 권한을 ACTIVE GUEST(ampId)에게 위임한다.
 	 *
 	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(side-effect): 위임 후 document hostNickname/캐시 갱신 및 HostTransferred 이벤트 발행.
+	 * TODO(side-effect): 위임 후 document hostNickname/캐시 갱신.
 	 */
 	@Override
 	@Transactional
@@ -383,13 +441,20 @@ public class AgitService implements AgitUseCase {
 		target.promoteToHost();
 		agitMemberProfilePersistencePort.save(currentHost);
 		agitMemberProfilePersistencePort.save(target);
+
+		Map<String, Object> transferPayload = new LinkedHashMap<>();
+		transferPayload.put("agitUuid", agit.getAgitUuid().toString());
+		transferPayload.put("previousHostUserUuid", currentHost.getUserUuid().toString());
+		transferPayload.put("newHostUserUuid", target.getUserUuid().toString());
+		transferPayload.put("newHostNickname", target.getNickname());
+		publishEvent(AgitEventTopics.HOST_TRANSFERRED, agit.getAgitUuid(), transferPayload);
 	}
 
 	/**
 	 * 초대 코드를 재발급한다. 호출마다 새 코드를 발급한다. 연타 방지는 FE에서 처리한다.
 	 *
 	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(side-effect): 재발급 후 구 code 캐시 무효화·신 code document 갱신 및 InviteCodeReissued 이벤트 발행.
+	 * TODO(side-effect): 재발급 후 구 code 캐시 무효화·신 code document 갱신.
 	 */
 	@Override
 	@Transactional
@@ -399,9 +464,16 @@ public class AgitService implements AgitUseCase {
 		Agit agit = requireActiveAgit(agitUuid);
 		requireActiveHost(agit.getId(), actorUserUuid);
 
+		String previousCode = agit.getCode();
 		String newCode = generateUniqueCode();
 		agit.reissueCode(newCode);
 		Agit saved = agitPersistencePort.save(agit);
+
+		Map<String, Object> reissuePayload = new LinkedHashMap<>();
+		reissuePayload.put("agitUuid", saved.getAgitUuid().toString());
+		reissuePayload.put("previousCode", previousCode);
+		reissuePayload.put("code", saved.getCode());
+		publishEvent(AgitEventTopics.INVITE_CODE_REISSUED, saved.getAgitUuid(), reissuePayload);
 
 		return ReissueInviteCodeResultDto.builder()
 				.code(saved.getCode())
@@ -454,6 +526,13 @@ public class AgitService implements AgitUseCase {
 		profile.updateProfile(requestDto.getNickname(), requestDto.getProfileImagePath());
 		AgitMemberProfile saved = agitMemberProfilePersistencePort.save(profile);
 
+		Map<String, Object> profilePayload = new LinkedHashMap<>();
+		profilePayload.put("agitUuid", agit.getAgitUuid().toString());
+		profilePayload.put("userUuid", saved.getUserUuid().toString());
+		profilePayload.put("nickname", saved.getNickname());
+		profilePayload.put("profileImagePath", saved.getProfileImagePath());
+		publishEvent(AgitEventTopics.MEMBER_PROFILE_UPDATED, agit.getAgitUuid(), profilePayload);
+
 		return UpdateMyMemberProfileResultDto.builder()
 				.nickname(saved.getNickname())
 				.profileImagePath(saved.getProfileImagePath())
@@ -485,6 +564,17 @@ public class AgitService implements AgitUseCase {
 	private void requireActorUserUuid(UUID actorUserUuid) {
 		if (actorUserUuid == null) {
 			throw new IllegalArgumentException("사용자 UUID는 필수입니다.");
+		}
+	}
+
+	private void publishEvent(String topic, UUID agitUuid, Map<String, Object> payload) {
+		payload.put("occurredAt", LocalDateTime.now().toString());
+		try {
+			eventPublisherPort.publish(topic, agitUuid.toString(), objectMapper.writeValueAsString(payload));
+		} catch (JsonProcessingException e) {
+			log.warn("{} 이벤트 직렬화 실패 (쓰기는 완료됨): {}", topic, e.getMessage());
+		} catch (Exception e) {
+			log.warn("{} 이벤트 발행 실패 (쓰기는 완료됨): {}", topic, e.getMessage());
 		}
 	}
 

@@ -3,9 +3,12 @@ package com.plip.agit.application.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.plip.agit.application.exception.AgitMemberNotActiveException;
 import com.plip.agit.application.exception.AgitMemberNotFoundException;
 import com.plip.agit.application.port.in.dto.MyAgitItemDto;
@@ -13,8 +16,10 @@ import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileRequestDto;
 import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileResultDto;
 import com.plip.agit.application.port.out.ActiveMembershipAgit;
 import com.plip.agit.application.port.out.AgitBanPersistencePort;
+import com.plip.agit.application.port.out.AgitEventTopics;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
+import com.plip.agit.application.port.out.EventPublisherPort;
 import com.plip.agit.domain.model.Agit;
 import com.plip.agit.domain.model.AgitMemberProfile;
 import com.plip.agit.domain.model.AgitMemberRole;
@@ -28,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +47,12 @@ class AgitServiceMyAgitsAndProfileTest {
 
 	@Mock
 	private AgitBanPersistencePort agitBanPersistencePort;
+
+	@Mock
+	private EventPublisherPort eventPublisherPort;
+
+	@Spy
+	private ObjectMapper objectMapper = new ObjectMapper();
 
 	@InjectMocks
 	private AgitService agitService;
@@ -101,6 +113,11 @@ class AgitServiceMyAgitsAndProfileTest {
 		assertEquals("새닉네임", result.getNickname());
 		assertEquals("profiles/old.png", result.getProfileImagePath());
 		verify(agitMemberProfilePersistencePort).save(any(AgitMemberProfile.class));
+		verify(eventPublisherPort).publish(
+				eq(AgitEventTopics.MEMBER_PROFILE_UPDATED),
+				eq(agitUuid.toString()),
+				anyString()
+		);
 	}
 
 	@Test

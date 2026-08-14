@@ -4,6 +4,11 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  kafka:
+    bootstrap-servers: localhost:9092
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
   jpa:
     hibernate:
       ddl-auto: create-drop
