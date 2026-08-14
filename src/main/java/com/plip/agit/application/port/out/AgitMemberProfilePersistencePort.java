@@ -15,6 +15,8 @@ public interface AgitMemberProfilePersistencePort {
 
 	Optional<AgitMemberProfile> findActiveHostByAgitId(Long agitId);
 
+	List<AgitMemberProfile> findActiveByAgitId(Long agitId);
+
 	long countActiveByAgitId(Long agitId);
 
 	/**

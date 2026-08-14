@@ -42,6 +42,8 @@ public interface AgitMemberProfileRepository extends JpaRepository<AgitMemberPro
 
 	long countByAgitIdAndStatus(Long agitId, AgitMemberStatus status);
 
+	List<AgitMemberProfileEntity> findByAgitIdAndStatus(Long agitId, AgitMemberStatus status);
+
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("""
 			UPDATE AgitMemberProfileEntity p

@@ -1,6 +1,7 @@
 package com.plip.agit.application.port.out;
 
 import com.plip.agit.domain.model.Agit;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,4 +16,6 @@ public interface AgitPersistencePort {
 	Optional<Agit> findActiveByCode(String code);
 
 	boolean existsByCode(String code);
+
+	List<Agit> findAll();
 }
