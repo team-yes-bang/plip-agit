@@ -13,6 +13,9 @@ spring:
         format_sql: true
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/plip_agit?replicaSet=rs0}
 
 eureka:
   instance:
