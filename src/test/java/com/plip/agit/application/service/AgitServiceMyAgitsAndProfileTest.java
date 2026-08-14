@@ -19,6 +19,7 @@ import com.plip.agit.application.port.out.AgitBanPersistencePort;
 import com.plip.agit.application.port.out.AgitEventTopics;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
+import com.plip.agit.application.port.out.AgitReadPersistencePort;
 import com.plip.agit.application.port.out.EventPublisherPort;
 import com.plip.agit.domain.model.Agit;
 import com.plip.agit.domain.model.AgitMemberProfile;
@@ -47,6 +48,9 @@ class AgitServiceMyAgitsAndProfileTest {
 
 	@Mock
 	private AgitBanPersistencePort agitBanPersistencePort;
+
+	@Mock
+	private AgitReadPersistencePort agitReadPersistencePort;
 
 	@Mock
 	private EventPublisherPort eventPublisherPort;
