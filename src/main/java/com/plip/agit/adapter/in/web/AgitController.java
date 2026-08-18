@@ -26,6 +26,7 @@ import com.plip.agit.application.port.in.dto.UpdateAgitResultDto;
 import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileRequestDto;
 import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileResultDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,12 +68,19 @@ public class AgitController {
 			summary = "내 아지트 목록 조회",
 			description = "접속 유저가 ACTIVE로 속한 아지트 목록(제목·UUID)을 반환합니다. "
 					+ "정렬은 agit.updated_at 내림차순(임시)이며, 이후 최근 토픽순으로 교체 예정입니다. "
-					+ "userUuid는 임시로 request body로 받습니다."
+					+ "userUuid는 임시로 X-User-Uuid 헤더로 받습니다."
 	)
 	@GetMapping("/me")
-	public List<MyAgitItemResponse> listMyAgits(@RequestBody ActorUserRequest request) {
-		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
-		List<MyAgitItemDto> resultDtos = agitUseCase.listMyAgits(request.getUserUuid());
+	public List<MyAgitItemResponse> listMyAgits(
+			@Parameter(
+					description = "접속 유저 UUID. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.",
+					required = true,
+					example = "018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e"
+			)
+			@RequestHeader("X-User-Uuid") UUID userUuid
+	) {
+		// TODO: userUuid는 현재 X-User-Uuid 헤더로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+		List<MyAgitItemDto> resultDtos = agitUseCase.listMyAgits(userUuid);
 		return agitWebMapper.toMyAgitResponses(resultDtos);
 	}
 
