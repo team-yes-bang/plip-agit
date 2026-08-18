@@ -8,6 +8,7 @@ import com.plip.agit.application.exception.AgitMemberNotActiveException;
 import com.plip.agit.application.exception.AgitMemberNotFoundException;
 import com.plip.agit.application.exception.AgitNotFoundException;
 import com.plip.agit.application.exception.CannotBanHostException;
+import com.plip.agit.application.exception.CannotMuteSelfException;
 import com.plip.agit.application.exception.CapacityBelowCurrentException;
 import com.plip.agit.application.exception.HostCannotLeaveException;
 import com.plip.agit.application.exception.InvalidInviteCodeException;
@@ -117,6 +118,15 @@ public class AgitExceptionHandler {
 	public ErrorResponse handleCannotBanHost(CannotBanHostException ex) {
 		return ErrorResponse.builder()
 				.code("CANNOT_BAN_HOST")
+				.message(ex.getMessage())
+				.build();
+	}
+
+	@ExceptionHandler(CannotMuteSelfException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleCannotMuteSelf(CannotMuteSelfException ex) {
+		return ErrorResponse.builder()
+				.code("CANNOT_MUTE_SELF")
 				.message(ex.getMessage())
 				.build();
 	}

@@ -14,6 +14,8 @@
 #   agit.host-transferred.v1.md
 #   agit.invite-code-reissued.v1.md
 #   agit.member-profile-updated.v1.md
+#   agit.user-muted.v1.md (TODO)
+#   agit.user-unmuted.v1.md (TODO)
 #   topic.bound.v1.md
 #   topic.unbound.v1.md
 #   topic.started.v1.md

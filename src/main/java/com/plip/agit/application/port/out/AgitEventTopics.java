@@ -12,6 +12,8 @@ public final class AgitEventTopics {
 	public static final String HOST_TRANSFERRED = "agit.host-transferred";
 	public static final String INVITE_CODE_REISSUED = "agit.invite-code-reissued";
 	public static final String MEMBER_PROFILE_UPDATED = "agit.member-profile-updated";
+	// TODO(event): 아지트 내 유저 뮤트 등록 시 agit.user-muted 발행
+	// TODO(event): 아지트 내 유저 뮤트 해제 시 agit.user-unmuted 발행
 
 	private AgitEventTopics() {
 	}

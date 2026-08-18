@@ -40,3 +40,13 @@ CREATE TABLE agit_bans (
     unbanned_at      DATETIME     NULL,
     INDEX idx_agit_bans_agit_user (agit_id, user_uuid)
 );
+
+CREATE TABLE agit_mutes (
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    agit_id      BIGINT     NOT NULL COMMENT 'agits.id 논리 FK',
+    muter_uuid   BINARY(16) NOT NULL COMMENT '뮤트한 사람 UUIDv7',
+    muted_uuid   BINARY(16) NOT NULL COMMENT '뮤트된 사람 UUIDv7',
+    created_at   DATETIME   NOT NULL,
+    updated_at   DATETIME   NOT NULL,
+    CONSTRAINT uk_agit_mutes_pair UNIQUE (agit_id, muter_uuid, muted_uuid)
+);
