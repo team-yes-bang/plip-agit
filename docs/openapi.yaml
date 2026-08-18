@@ -8,6 +8,8 @@ servers:
 tags:
 - name: Agit
   description: 아지트 API
+- name: Agit Mute
+  description: 아지트 내 유저 뮤트 API
 paths:
   /api/v1/agits:
     post:
@@ -23,8 +25,8 @@ paths:
               $ref: "#/components/schemas/CreateAgitRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -41,8 +43,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -74,8 +76,8 @@ paths:
               $ref: "#/components/schemas/JoinAgitRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -92,8 +94,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -104,6 +106,111 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/JoinAgitResponse"
+  /api/v1/agits/{agitUuid}/mutes/{mutedUuid}:
+    post:
+      tags:
+      - Agit Mute
+      summary: 아지트 내 유저 뮤트
+      description: 해당 아지트의 ACTIVE 멤버가 다른 ACTIVE 멤버를 뮤트합니다. 이미 뮤트된 경우 변경 없이 성공합니다.
+      operationId: muteMember
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: mutedUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "204":
+          description: No Content
+    delete:
+      tags:
+      - Agit Mute
+      summary: 아지트 내 유저 뮤트 해제
+      description: 본인이 건 뮤트를 해제합니다. 뮤트 관계가 없으면 변경 없이 성공합니다.
+      operationId: unmuteMember
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: mutedUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "204":
+          description: No Content
   /api/v1/agits/{agitUuid}/members/{userUuid}/unban:
     post:
       tags:
@@ -132,8 +239,8 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -150,8 +257,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -185,8 +292,8 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -203,8 +310,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -239,8 +346,8 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -257,8 +364,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -287,8 +394,8 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -305,8 +412,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -334,8 +441,8 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -352,8 +459,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -386,8 +493,8 @@ paths:
               $ref: "#/components/schemas/UpdateAgitRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -404,8 +511,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -437,8 +544,8 @@ paths:
               $ref: "#/components/schemas/UpdateMyMemberProfileRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -455,8 +562,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -481,8 +588,8 @@ paths:
         schema:
           type: string
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -499,8 +606,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -511,6 +618,60 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AgitLandingResponse"
+  /api/v1/agits/{agitUuid}/mutes:
+    get:
+      tags:
+      - Agit Mute
+      summary: 내 뮤트 목록 조회
+      description: 해당 아지트에서 내가 뮤트한 사용자 UUID 목록을 반환합니다. userUuid는 임시로 request body로
+        받습니다.
+      operationId: listMyMutes
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActorUserRequest"
+        required: true
+      responses:
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MuteItemResponse"
   /api/v1/agits/me:
     get:
       tags:
@@ -526,8 +687,8 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -544,8 +705,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -564,8 +725,8 @@ paths:
       - test-controller
       operationId: test
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -582,8 +743,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -600,8 +761,8 @@ paths:
       - test-controller
       operationId: ping
       responses:
-        "404":
-          description: Not Found
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -618,8 +779,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -907,6 +1068,15 @@ components:
           type: string
           description: 섬네일 경로
           example: agits/thumbnails/sample.png
+    MuteItemResponse:
+      type: object
+      description: 아지트 내 뮤트 목록 항목
+      properties:
+        mutedUuid:
+          type: string
+          format: uuid
+          description: 뮤트된 사용자 UUID
+          example: 01912345-6789-7abc-def0-123456789abc
     MyAgitItemResponse:
       type: object
       description: 내 아지트 목록 항목
