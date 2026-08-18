@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class AgitMemberNotActiveException extends RuntimeException {
 
 	public AgitMemberNotActiveException() {
-		super("ACTIVE 멤버만 프로필을 수정할 수 있습니다.");
+		this("ACTIVE 멤버만 이 작업을 수행할 수 있습니다.");
+	}
+
+	public AgitMemberNotActiveException(String message) {
+		super(message);
 	}
 }
