@@ -31,6 +31,9 @@ import com.plip.agit.application.port.out.AgitBanPersistencePort;
 import com.plip.agit.application.port.out.AgitEventTopics;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
+import com.plip.agit.application.port.out.AgitReadMemberSnapshot;
+import com.plip.agit.application.port.out.AgitReadPersistencePort;
+import com.plip.agit.application.port.out.AgitReadSnapshot;
 import com.plip.agit.application.port.out.EventPublisherPort;
 import com.plip.agit.domain.model.Agit;
 import com.plip.agit.domain.model.AgitBan;
@@ -44,6 +47,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +68,7 @@ public class AgitService implements AgitUseCase {
 	private final AgitPersistencePort agitPersistencePort;
 	private final AgitMemberProfilePersistencePort agitMemberProfilePersistencePort;
 	private final AgitBanPersistencePort agitBanPersistencePort;
+	private final AgitReadPersistencePort agitReadPersistencePort;
 	private final EventPublisherPort eventPublisherPort;
 	private final ObjectMapper objectMapper;
 	private final SecureRandom secureRandom = new SecureRandom();
@@ -123,20 +128,44 @@ public class AgitService implements AgitUseCase {
 	}
 
 	/**
-	 * 초대 코드로 랜딩 표시용 아지트 정보를 조회한다.
+	 * 초대 코드로 랜딩 표시용 아지트 정보를 조회한다. Mongo 읽기 문서를 우선하고, miss면 MySQL.
 	 *
-	 * <p>TODO(read-model):
-	 * Document — 랜딩 비정규화 필드(제목·소개·인원·HOST 닉네임·섬네일 등)로 읽기 경로 교체.
-	 * Redis — code → landing 캐시(선택) + 무효화.
-	 * 동기화 — 입장/퇴장·위임·메타 수정·삭제 시 document(·캐시) 갱신.
-	 * TODO(prod): Gateway 미사용. K8s Ingress(+ Service 앞단)에서 이 GET에 IP rate limit
+	 * <p>TODO(prod): Gateway 미사용. K8s Ingress(+ Service 앞단)에서 이 GET에 IP rate limit
 	 * (권장 60/min, burst 10~20/10s). 테스트용 Gateway whitelist와 별개.
-	 * TODO(currentMemberCount): 현재는 MySQL ACTIVE COUNT. 이후 NoSQL document 필드로 교체.
 	 */
 	@Override
 	public AgitLandingResultDto getLandingByCode(String code) {
 		String normalizedCode = normalizeInviteCode(code);
 
+		Optional<AgitLandingResultDto> fromMongo = agitReadPersistencePort.findActiveByCode(normalizedCode)
+				.flatMap(this::toLandingFromReadModel);
+		if (fromMongo.isPresent()) {
+			return fromMongo.get();
+		}
+
+		log.info("랜딩 Mongo miss, MySQL 폴백 code={}", normalizedCode);
+		return getLandingByCodeFromMysql(normalizedCode);
+	}
+
+	private Optional<AgitLandingResultDto> toLandingFromReadModel(AgitReadSnapshot snapshot) {
+		return snapshot.members().stream()
+				.filter(member -> member.role() == AgitMemberRole.HOST)
+				.findFirst()
+				.map(host -> toLandingResult(snapshot, host));
+	}
+
+	private AgitLandingResultDto toLandingResult(AgitReadSnapshot snapshot, AgitReadMemberSnapshot host) {
+		return AgitLandingResultDto.builder()
+				.agitName(snapshot.agitName())
+				.description(snapshot.description())
+				.currentMemberCount(snapshot.members().size())
+				.maximumCapacity(snapshot.maximumCapacity())
+				.hostNickname(host.nickname())
+				.thumbnailPath(snapshot.thumbnailPath())
+				.build();
+	}
+
+	private AgitLandingResultDto getLandingByCodeFromMysql(String normalizedCode) {
 		Agit agit = agitPersistencePort.findActiveByCode(normalizedCode)
 				.orElseThrow(AgitNotFoundException::new);
 

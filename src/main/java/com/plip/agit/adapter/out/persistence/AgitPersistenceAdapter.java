@@ -4,6 +4,7 @@ import com.plip.agit.adapter.out.persistence.mapper.AgitEntityMapper;
 import com.plip.agit.application.port.out.AgitPersistencePort;
 import com.plip.agit.domain.model.Agit;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -64,5 +65,12 @@ public class AgitPersistenceAdapter implements AgitPersistencePort {
 	@Override
 	public boolean existsByCode(String code) {
 		return agitRepository.existsByCode(code);
+	}
+
+	@Override
+	public List<Agit> findAll() {
+		return agitRepository.findAll().stream()
+				.map(agitEntityMapper::toDomain)
+				.toList();
 	}
 }

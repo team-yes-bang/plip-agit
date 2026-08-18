@@ -13,6 +13,15 @@ spring:
         format_sql: true
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017/plip_agit?replicaSet=rs0}
+  data:
+    mongodb:
+      auto-index-creation: true
+
+agit:
+  mongo:
+    backfill: ${AGIT_MONGO_BACKFILL:false}
 
 eureka:
   instance:

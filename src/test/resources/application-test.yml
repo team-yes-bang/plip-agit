@@ -6,9 +6,18 @@ spring:
     driver-class-name: org.h2.Driver
   kafka:
     bootstrap-servers: localhost:9092
+  mongodb:
+    uri: mongodb://localhost:27017/plip_agit_test
+  data:
+    mongodb:
+      repositories:
+        type: none
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+      - org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration
+      - org.springframework.boot.data.mongodb.autoconfigure.DataMongoAutoConfiguration
+      - org.springframework.boot.data.mongodb.autoconfigure.DataMongoRepositoriesAutoConfiguration
   jpa:
     hibernate:
       ddl-auto: create-drop
