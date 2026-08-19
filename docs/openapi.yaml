@@ -31,12 +31,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -45,6 +39,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -82,12 +82,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -96,6 +90,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -139,12 +139,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -153,6 +147,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -191,12 +191,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -205,6 +199,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -245,12 +245,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -259,6 +253,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -298,12 +298,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -312,6 +306,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -352,12 +352,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -366,6 +360,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -400,12 +400,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -414,6 +408,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -447,12 +447,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -461,6 +455,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -499,12 +499,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -513,6 +507,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -550,12 +550,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -564,6 +558,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -594,12 +594,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -608,6 +602,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -646,12 +646,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -660,6 +654,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -688,16 +688,10 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
       responses:
         "409":
           description: Conflict
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
           content:
             '*/*':
               schema:
@@ -710,6 +704,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -734,12 +734,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -748,6 +742,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
@@ -770,12 +770,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "400":
           description: Bad Request
           content:
@@ -784,6 +778,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
