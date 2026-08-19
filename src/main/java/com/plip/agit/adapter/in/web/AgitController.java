@@ -1,6 +1,7 @@
 package com.plip.agit.adapter.in.web;
 
 import com.plip.agit.adapter.in.web.dto.ActorUserRequest;
+import com.plip.agit.adapter.in.web.dto.AgitDetailResponse;
 import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
@@ -14,6 +15,7 @@ import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileRequest;
 import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileResponse;
 import com.plip.agit.adapter.in.web.mapper.AgitWebMapper;
 import com.plip.agit.application.port.in.AgitUseCase;
+import com.plip.agit.application.port.in.dto.AgitDetailResultDto;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
@@ -82,6 +84,26 @@ public class AgitController {
 		// TODO: userUuid는 현재 X-User-Uuid 헤더로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
 		List<MyAgitItemDto> resultDtos = agitUseCase.listMyAgits(userUuid);
 		return agitWebMapper.toMyAgitResponses(resultDtos);
+	}
+
+	@Operation(
+			summary = "아지트 상세 조회",
+			description = "ACTIVE 멤버가 아지트 상세(메타·멤버·묶인 토픽)를 조회합니다. "
+					+ "Mongo 읽기 모델을 우선하고, 없으면 MySQL에서 읽기 모델을 채운 뒤 반환합니다. "
+					+ "userUuid는 임시로 X-User-Uuid 헤더로 받습니다. 초대 코드는 포함하지 않습니다."
+	)
+	@GetMapping("/{agitUuid}")
+	public AgitDetailResponse getAgit(
+			@PathVariable UUID agitUuid,
+			@Parameter(
+					description = "접속 유저 UUID. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.",
+					required = true,
+					example = "018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e"
+			)
+			@RequestHeader("X-User-Uuid") UUID userUuid
+	) {
+		AgitDetailResultDto resultDto = agitUseCase.getAgit(agitUuid, userUuid);
+		return agitWebMapper.toDetailResponse(resultDto);
 	}
 
 	@Operation(

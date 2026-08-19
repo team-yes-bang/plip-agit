@@ -1,5 +1,6 @@
 package com.plip.agit.adapter.in.web.mapper;
 
+import com.plip.agit.adapter.in.web.dto.AgitDetailResponse;
 import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
@@ -11,6 +12,7 @@ import com.plip.agit.adapter.in.web.dto.UpdateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.UpdateAgitResponse;
 import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileRequest;
 import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileResponse;
+import com.plip.agit.application.port.in.dto.AgitDetailResultDto;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
@@ -52,6 +54,34 @@ public class AgitWebMapper {
 				.nickname(resultDto.getNickname())
 				.profileImagePath(resultDto.getProfileImagePath())
 				.role(resultDto.getRole())
+				.build();
+	}
+
+	public AgitDetailResponse toDetailResponse(AgitDetailResultDto resultDto) {
+		return AgitDetailResponse.builder()
+				.agitUuid(resultDto.getAgitUuid())
+				.agitName(resultDto.getAgitName())
+				.description(resultDto.getDescription())
+				.thumbnailPath(resultDto.getThumbnailPath())
+				.status(resultDto.getStatus())
+				.maximumCapacity(resultDto.getMaximumCapacity())
+				.currentMemberCount(resultDto.getCurrentMemberCount())
+				.hostNickname(resultDto.getHostNickname())
+				.myRole(resultDto.getMyRole())
+				.members(resultDto.getMembers().stream()
+						.map(member -> AgitDetailResponse.Member.builder()
+								.userUuid(member.getUserUuid())
+								.nickname(member.getNickname())
+								.profileImagePath(member.getProfileImagePath())
+								.role(member.getRole())
+								.build())
+						.toList())
+				.topics(resultDto.getTopics().stream()
+						.map(topic -> AgitDetailResponse.Topic.builder()
+								.topicId(topic.getTopicId())
+								.startedAt(topic.getStartedAt())
+								.build())
+						.toList())
 				.build();
 	}
 

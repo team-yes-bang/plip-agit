@@ -15,6 +15,8 @@ import com.plip.agit.application.exception.InvalidInviteCodeException;
 import com.plip.agit.application.exception.InvalidTransferTargetException;
 import com.plip.agit.application.exception.NotAgitHostException;
 import com.plip.agit.application.port.in.AgitUseCase;
+import com.plip.agit.application.port.in.RefreshAgitReadModelUseCase;
+import com.plip.agit.application.port.in.dto.AgitDetailResultDto;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
@@ -69,6 +71,7 @@ public class AgitService implements AgitUseCase {
 	private final AgitMemberProfilePersistencePort agitMemberProfilePersistencePort;
 	private final AgitBanPersistencePort agitBanPersistencePort;
 	private final AgitReadPersistencePort agitReadPersistencePort;
+	private final RefreshAgitReadModelUseCase refreshAgitReadModelUseCase;
 	private final EventPublisherPort eventPublisherPort;
 	private final ObjectMapper objectMapper;
 	private final SecureRandom secureRandom = new SecureRandom();
@@ -147,6 +150,42 @@ public class AgitService implements AgitUseCase {
 		return getLandingByCodeFromMysql(normalizedCode);
 	}
 
+	/**
+	 * 아지트 상세를 Mongo 읽기 모델에서 조회한다. miss면 MySQL로 refresh 후 재조회한다.
+	 * ACTIVE 멤버만 허용한다. 응답에 초대 코드는 포함하지 않는다.
+	 */
+	@Override
+	public AgitDetailResultDto getAgit(UUID agitUuid, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+		if (agitUuid == null) {
+			throw new IllegalArgumentException("아지트 UUID는 필수입니다.");
+		}
+
+		Optional<AgitReadSnapshot> found = agitReadPersistencePort.findByAgitUuid(agitUuid);
+		if (found.isEmpty()) {
+			log.info("상세 Mongo miss, 읽기 모델 refresh agitUuid={}", agitUuid);
+			refreshAgitReadModelUseCase.refresh(agitUuid);
+			found = agitReadPersistencePort.findByAgitUuid(agitUuid);
+		}
+
+		AgitReadSnapshot snapshot = found.orElseThrow(AgitNotFoundException::new);
+		if (snapshot.status() != AgitStatus.ACTIVE) {
+			throw new AgitNotFoundException();
+		}
+
+		AgitReadMemberSnapshot me = snapshot.members().stream()
+				.filter(member -> actorUserUuid.equals(member.userUuid()))
+				.findFirst()
+				.orElseThrow(AgitMemberNotActiveException::new);
+
+		AgitReadMemberSnapshot host = snapshot.members().stream()
+				.filter(member -> member.role() == AgitMemberRole.HOST)
+				.findFirst()
+				.orElseThrow(AgitNotFoundException::new);
+
+		return toDetailResult(snapshot, host, me);
+	}
+
 	private Optional<AgitLandingResultDto> toLandingFromReadModel(AgitReadSnapshot snapshot) {
 		return snapshot.members().stream()
 				.filter(member -> member.role() == AgitMemberRole.HOST)
@@ -165,9 +204,45 @@ public class AgitService implements AgitUseCase {
 				.build();
 	}
 
+	private AgitDetailResultDto toDetailResult(
+			AgitReadSnapshot snapshot,
+			AgitReadMemberSnapshot host,
+			AgitReadMemberSnapshot me
+	) {
+		List<AgitDetailResultDto.Member> members = snapshot.members().stream()
+				.map(member -> AgitDetailResultDto.Member.builder()
+						.userUuid(member.userUuid())
+						.nickname(member.nickname())
+						.profileImagePath(member.profileImagePath())
+						.role(member.role())
+						.build())
+				.toList();
+		List<AgitDetailResultDto.Topic> topics = snapshot.topics().stream()
+				.map(topic -> AgitDetailResultDto.Topic.builder()
+						.topicId(topic.topicId())
+						.startedAt(topic.startedAt())
+						.build())
+				.toList();
+		return AgitDetailResultDto.builder()
+				.agitUuid(snapshot.agitUuid())
+				.agitName(snapshot.agitName())
+				.description(snapshot.description())
+				.thumbnailPath(snapshot.thumbnailPath())
+				.status(snapshot.status())
+				.maximumCapacity(snapshot.maximumCapacity())
+				.currentMemberCount(snapshot.members().size())
+				.hostNickname(host.nickname())
+				.myRole(me.role())
+				.members(members)
+				.topics(topics)
+				.build();
+	}
+
 	private AgitLandingResultDto getLandingByCodeFromMysql(String normalizedCode) {
 		Agit agit = agitPersistencePort.findActiveByCode(normalizedCode)
 				.orElseThrow(AgitNotFoundException::new);
+
+		refreshAgitReadModelUseCase.refresh(agit.getAgitUuid());
 
 		AgitMemberProfile host = agitMemberProfilePersistencePort
 				.findActiveHostByAgitId(agit.getId())
