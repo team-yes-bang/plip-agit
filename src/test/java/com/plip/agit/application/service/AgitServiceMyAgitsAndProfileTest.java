@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.plip.agit.application.exception.AgitMemberNotActiveException;
 import com.plip.agit.application.exception.AgitMemberNotFoundException;
+import com.plip.agit.application.port.in.RefreshAgitReadModelUseCase;
 import com.plip.agit.application.port.in.dto.MyAgitItemDto;
 import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileRequestDto;
 import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileResultDto;
@@ -51,6 +52,9 @@ class AgitServiceMyAgitsAndProfileTest {
 
 	@Mock
 	private AgitReadPersistencePort agitReadPersistencePort;
+
+	@Mock
+	private RefreshAgitReadModelUseCase refreshAgitReadModelUseCase;
 
 	@Mock
 	private EventPublisherPort eventPublisherPort;

@@ -25,14 +25,14 @@ paths:
               $ref: "#/components/schemas/CreateAgitRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -76,14 +76,14 @@ paths:
               $ref: "#/components/schemas/JoinAgitRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -133,14 +133,14 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -185,14 +185,14 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -239,14 +239,14 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -292,14 +292,14 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -346,14 +346,14 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -394,14 +394,14 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -441,14 +441,14 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -472,6 +472,60 @@ paths:
               schema:
                 $ref: "#/components/schemas/ReissueInviteCodeResponse"
   /api/v1/agits/{agitUuid}:
+    get:
+      tags:
+      - Agit
+      summary: 아지트 상세 조회
+      description: "ACTIVE 멤버가 아지트 상세(메타·멤버·묶인 토픽)를 조회합니다. Mongo 읽기 모델을 우선하고, 없으면\
+        \ MySQL에서 읽기 모델을 채운 뒤 반환합니다. userUuid는 임시로 X-User-Uuid 헤더로 받습니다. 초대 코드는 포함\
+        하지 않습니다."
+      operationId: getAgit
+      parameters:
+      - name: agitUuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: X-User-Uuid
+        in: header
+        description: 접속 유저 UUID. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AgitDetailResponse"
     patch:
       tags:
       - Agit
@@ -493,14 +547,14 @@ paths:
               $ref: "#/components/schemas/UpdateAgitRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -544,14 +598,14 @@ paths:
               $ref: "#/components/schemas/UpdateMyMemberProfileRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -588,14 +642,14 @@ paths:
         schema:
           type: string
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -640,14 +694,14 @@ paths:
               $ref: "#/components/schemas/ActorUserRequest"
         required: true
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -690,14 +744,14 @@ paths:
           format: uuid
         example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -728,14 +782,14 @@ paths:
       - test-controller
       operationId: test
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -764,14 +818,14 @@ paths:
       - test-controller
       operationId: ping
       responses:
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -1071,6 +1125,101 @@ components:
           type: string
           description: 섬네일 경로
           example: agits/thumbnails/sample.png
+    AgitDetailResponse:
+      type: object
+      description: 아지트 상세 조회 응답
+      properties:
+        agitUuid:
+          type: string
+          format: uuid
+          description: 아지트 UUID
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        agitName:
+          type: string
+          description: 아지트 제목
+          example: 주말 보드게임
+        description:
+          type: string
+          description: 소개글
+          example: 가볍게 즐겨요
+        thumbnailPath:
+          type: string
+          description: 섬네일 경로
+          example: agits/thumbnails/sample.png
+        status:
+          type: string
+          description: 아지트 상태
+          enum:
+          - ACTIVE
+          - DELETED
+          example: ACTIVE
+        maximumCapacity:
+          type: integer
+          format: int32
+          description: 최대 인원
+          example: 5
+        currentMemberCount:
+          type: integer
+          format: int64
+          description: 현재 인원 (ACTIVE 멤버 수)
+          example: 2
+        hostNickname:
+          type: string
+          description: 아지트장 닉네임
+          example: 보드왕
+        myRole:
+          type: string
+          description: 요청 유저의 역할
+          enum:
+          - HOST
+          - GUEST
+          example: GUEST
+        members:
+          type: array
+          description: ACTIVE 멤버 목록
+          items:
+            $ref: "#/components/schemas/Member"
+        topics:
+          type: array
+          description: 묶인 토픽 목록
+          items:
+            $ref: "#/components/schemas/Topic"
+    Member:
+      type: object
+      description: 아지트 멤버
+      properties:
+        userUuid:
+          type: string
+          format: uuid
+          description: 유저 UUID
+          example: 018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e
+        nickname:
+          type: string
+          description: 닉네임
+          example: 보드왕
+        profileImagePath:
+          type: string
+          description: 프로필 이미지 경로
+          example: profiles/host.png
+        role:
+          type: string
+          description: 역할
+          enum:
+          - HOST
+          - GUEST
+          example: HOST
+    Topic:
+      type: object
+      description: 묶인 토픽
+      properties:
+        topicId:
+          type: string
+          description: 토픽 ID
+          example: topic-1
+        startedAt:
+          type: string
+          format: date-time
+          description: 토픽 시작 시각
     MuteItemResponse:
       type: object
       description: 아지트 내 뮤트 목록 항목

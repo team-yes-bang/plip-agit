@@ -2,12 +2,14 @@ package com.plip.agit.application.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.plip.agit.application.exception.AgitNotFoundException;
+import com.plip.agit.application.port.in.RefreshAgitReadModelUseCase;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.out.AgitBanPersistencePort;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
@@ -47,6 +49,9 @@ class AgitServiceLandingTest {
 	private AgitReadPersistencePort agitReadPersistencePort;
 
 	@Mock
+	private RefreshAgitReadModelUseCase refreshAgitReadModelUseCase;
+
+	@Mock
 	private EventPublisherPort eventPublisherPort;
 
 	@Spy
@@ -84,6 +89,7 @@ class AgitServiceLandingTest {
 		assertEquals(5, result.getMaximumCapacity());
 		assertEquals("보드왕", result.getHostNickname());
 		verify(agitPersistencePort, never()).findActiveByCode("A1B2C3");
+		verify(refreshAgitReadModelUseCase, never()).refresh(any());
 	}
 
 	@Test
@@ -106,6 +112,7 @@ class AgitServiceLandingTest {
 		assertEquals("주말 보드게임", result.getAgitName());
 		assertEquals("보드왕", result.getHostNickname());
 		assertEquals(1, result.getCurrentMemberCount());
+		verify(refreshAgitReadModelUseCase).refresh(agitUuid);
 	}
 
 	@Test
