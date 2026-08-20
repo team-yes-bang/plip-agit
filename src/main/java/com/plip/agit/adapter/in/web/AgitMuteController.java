@@ -1,6 +1,5 @@
 package com.plip.agit.adapter.in.web;
 
-import com.plip.agit.adapter.in.web.dto.ActorUserRequest;
 import com.plip.agit.adapter.in.web.dto.MuteItemResponse;
 import com.plip.agit.adapter.in.web.mapper.AgitMuteWebMapper;
 import com.plip.agit.application.port.in.AgitMuteUseCase;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,45 +28,37 @@ public class AgitMuteController {
 
 	@Operation(
 			summary = "아지트 내 유저 뮤트",
-			description = "해당 아지트의 ACTIVE 멤버가 다른 ACTIVE 멤버를 뮤트합니다. 이미 뮤트된 경우 변경 없이 성공합니다."
+			description = "해당 아지트의 ACTIVE 멤버가 다른 ACTIVE 멤버를 뮤트합니다. 이미 뮤트된 경우 변경 없이 성공합니다. 액터는 Access JWT에서 추출합니다."
 	)
 	@PostMapping("/{agitUuid}/mutes/{mutedUuid}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void muteMember(
 			@PathVariable UUID agitUuid,
-			@PathVariable UUID mutedUuid,
-			@RequestBody ActorUserRequest request
+			@PathVariable UUID mutedUuid
 	) {
-		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
-		agitMuteUseCase.muteMember(agitUuid, mutedUuid, request.getUserUuid());
+		agitMuteUseCase.muteMember(agitUuid, mutedUuid, AuthenticatedActor.requireUserUuid());
 	}
 
 	@Operation(
 			summary = "아지트 내 유저 뮤트 해제",
-			description = "본인이 건 뮤트를 해제합니다. 뮤트 관계가 없으면 변경 없이 성공합니다."
+			description = "본인이 건 뮤트를 해제합니다. 뮤트 관계가 없으면 변경 없이 성공합니다. 액터는 Access JWT에서 추출합니다."
 	)
 	@DeleteMapping("/{agitUuid}/mutes/{mutedUuid}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void unmuteMember(
 			@PathVariable UUID agitUuid,
-			@PathVariable UUID mutedUuid,
-			@RequestBody ActorUserRequest request
+			@PathVariable UUID mutedUuid
 	) {
-		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
-		agitMuteUseCase.unmuteMember(agitUuid, mutedUuid, request.getUserUuid());
+		agitMuteUseCase.unmuteMember(agitUuid, mutedUuid, AuthenticatedActor.requireUserUuid());
 	}
 
 	@Operation(
 			summary = "내 뮤트 목록 조회",
-			description = "해당 아지트에서 내가 뮤트한 사용자 UUID 목록을 반환합니다. "
-					+ "userUuid는 임시로 request body로 받습니다."
+			description = "해당 아지트에서 내가 뮤트한 사용자 UUID 목록을 반환합니다. 액터는 Access JWT에서 추출합니다."
 	)
 	@GetMapping("/{agitUuid}/mutes")
-	public List<MuteItemResponse> listMyMutes(
-			@PathVariable UUID agitUuid,
-			@RequestBody ActorUserRequest request
-	) {
-		// TODO: userUuid는 현재 request body로 수신. 인증 연동 후 Gateway/JWT에서 추출하도록 교체한다.
-		return agitMuteWebMapper.toResponses(agitMuteUseCase.listMyMutes(agitUuid, request.getUserUuid()));
+	public List<MuteItemResponse> listMyMutes(@PathVariable UUID agitUuid) {
+		return agitMuteWebMapper.toResponses(
+				agitMuteUseCase.listMyMutes(agitUuid, AuthenticatedActor.requireUserUuid()));
 	}
 }

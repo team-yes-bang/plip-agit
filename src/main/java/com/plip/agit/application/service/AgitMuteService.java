@@ -32,8 +32,7 @@ public class AgitMuteService implements AgitMuteUseCase {
 	/**
 	 * 아지트 ACTIVE 멤버가 같은 아지트의 다른 ACTIVE 멤버를 뮤트한다. 이미 뮤트된 경우 멱등.
 	 *
-	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(event): 뮤트 등록 후 agit.user-muted 발행 (payload: agitUuid, muterUuid, mutedUuid).
+	 * <p>TODO(event): 뮤트 등록 후 agit.user-muted 발행 (payload: agitUuid, muterUuid, mutedUuid).
 	 */
 	@Override
 	@Transactional
@@ -61,8 +60,7 @@ public class AgitMuteService implements AgitMuteUseCase {
 	/**
 	 * 본인이 건 뮤트를 해제한다. 뮤트 행이 없으면 멱등.
 	 *
-	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(event): 뮤트 해제 후 agit.user-unmuted 발행 (payload: agitUuid, muterUuid, mutedUuid).
+	 * <p>TODO(event): 뮤트 해제 후 agit.user-unmuted 발행 (payload: agitUuid, muterUuid, mutedUuid).
 	 */
 	@Override
 	@Transactional
@@ -80,8 +78,6 @@ public class AgitMuteService implements AgitMuteUseCase {
 
 	/**
 	 * 접속 유저가 해당 아지트에서 뮤트한 사용자 UUID 목록을 반환한다.
-	 *
-	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 */
 	@Override
 	public List<MuteItemDto> listMyMutes(UUID agitUuid, UUID actorUserUuid) {

@@ -1,7 +1,6 @@
 package com.plip.agit.adapter.in.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,12 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(description = "아지트 정보 변경 요청")
 public class UpdateAgitRequest {
-
-	/**
-	 * TODO: 인증 연동 후 Gateway/JWT에서 userUuid를 추출하도록 교체하고, request body 필드는 제거한다.
-	 */
-	@Schema(description = "요청자 사용자 UUID (UUIDv7, 임시 body 전달 — 추후 인증에서 추출)", example = "018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e")
-	private UUID userUuid;
 
 	@Schema(description = "아지트 제목 (필수, 최대 20자)", example = "주말 보드게임")
 	private String agitName;
