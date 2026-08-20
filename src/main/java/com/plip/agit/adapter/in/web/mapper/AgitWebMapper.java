@@ -25,18 +25,19 @@ import com.plip.agit.application.port.in.dto.UpdateAgitResultDto;
 import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileRequestDto;
 import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileResultDto;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AgitWebMapper {
 
-	public CreateAgitRequestDto toDto(CreateAgitRequest request) {
+	public CreateAgitRequestDto toDto(CreateAgitRequest request, UUID actorUserUuid) {
 		return CreateAgitRequestDto.builder()
 				.agitName(request.getAgitName())
 				.description(request.getDescription())
 				.maximumCapacity(request.getMaximumCapacity())
 				.thumbnailPath(request.getThumbnailPath())
-				.userUuid(request.getUserUuid())
+				.userUuid(actorUserUuid)
 				.nickname(request.getNickname())
 				.profileImagePath(request.getProfileImagePath())
 				.build();
@@ -96,9 +97,9 @@ public class AgitWebMapper {
 				.build();
 	}
 
-	public JoinAgitRequestDto toJoinDto(JoinAgitRequest request) {
+	public JoinAgitRequestDto toJoinDto(JoinAgitRequest request, UUID actorUserUuid) {
 		return JoinAgitRequestDto.builder()
-				.userUuid(request.getUserUuid())
+				.userUuid(actorUserUuid)
 				.nickname(request.getNickname())
 				.profileImagePath(request.getProfileImagePath())
 				.build();
@@ -114,9 +115,9 @@ public class AgitWebMapper {
 				.build();
 	}
 
-	public UpdateAgitRequestDto toUpdateDto(UpdateAgitRequest request) {
+	public UpdateAgitRequestDto toUpdateDto(UpdateAgitRequest request, UUID actorUserUuid) {
 		return UpdateAgitRequestDto.builder()
-				.userUuid(request.getUserUuid())
+				.userUuid(actorUserUuid)
 				.agitName(request.getAgitName())
 				.description(request.getDescription())
 				.maximumCapacity(request.getMaximumCapacity())
@@ -149,9 +150,12 @@ public class AgitWebMapper {
 				.toList();
 	}
 
-	public UpdateMyMemberProfileRequestDto toUpdateMyProfileDto(UpdateMyMemberProfileRequest request) {
+	public UpdateMyMemberProfileRequestDto toUpdateMyProfileDto(
+			UpdateMyMemberProfileRequest request,
+			UUID actorUserUuid
+	) {
 		return UpdateMyMemberProfileRequestDto.builder()
-				.userUuid(request.getUserUuid())
+				.userUuid(actorUserUuid)
 				.nickname(request.getNickname())
 				.profileImagePath(request.getProfileImagePath())
 				.build();

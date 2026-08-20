@@ -263,8 +263,7 @@ public class AgitService implements AgitUseCase {
 	/**
 	 * 초대 코드로 아지트에 입장한다. 신규는 GUEST INSERT, LEFT는 닉네임·이미지 갱신 후 ACTIVE.
 	 *
-	 * <p>TODO(auth): userUuid는 Gateway/JWT에서 추출하도록 교체한다.
-	 * TODO(side-effect): join 후 document/캐시 갱신.
+	 * <p>TODO(side-effect): join 후 document/캐시 갱신.
 	 */
 	@Override
 	@Transactional
@@ -328,7 +327,6 @@ public class AgitService implements AgitUseCase {
 	/**
 	 * 아지트장이 멤버를 내보낸다. ampId로 대상을 찾고, 이후 식별은 userUuid.
 	 *
-	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 * TODO(side-effect): ban 후 document/캐시 갱신.
 	 */
 	@Override
@@ -377,7 +375,6 @@ public class AgitService implements AgitUseCase {
 	/**
 	 * 아지트에서 나간다. HOST는 ACTIVE 인원이 본인 1명일 때만 가능하며, 이때 아지트를 소프트 삭제한다.
 	 *
-	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 * TODO(side-effect): leave/삭제 후 document/캐시 갱신.
 	 */
 	@Override
@@ -424,7 +421,6 @@ public class AgitService implements AgitUseCase {
 	/**
 	 * 밴을 해제한다. 성공 시 profile status는 항상 LEFT(멱등).
 	 *
-	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 * TODO(side-effect): unban 후 document/캐시 갱신.
 	 */
 	@Override
@@ -467,7 +463,6 @@ public class AgitService implements AgitUseCase {
 	/**
 	 * 아지트 메타(제목·소개·정원·섬네일)를 수정한다. 생성 검증과 동일하며, 정원은 현재 ACTIVE 인원 이상이어야 한다.
 	 *
-	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 * TODO(side-effect): 메타 수정 후 document/캐시 갱신.
 	 */
 	@Override
@@ -513,7 +508,6 @@ public class AgitService implements AgitUseCase {
 	/**
 	 * 아지트장 권한을 ACTIVE GUEST(ampId)에게 위임한다.
 	 *
-	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 * TODO(side-effect): 위임 후 document hostNickname/캐시 갱신.
 	 */
 	@Override
@@ -557,7 +551,6 @@ public class AgitService implements AgitUseCase {
 	/**
 	 * 초대 코드를 재발급한다. 호출마다 새 코드를 발급한다. 연타 방지는 FE에서 처리한다.
 	 *
-	 * <p>TODO(auth): actorUserUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 * TODO(side-effect): 재발급 후 구 code 캐시 무효화·신 code document 갱신.
 	 */
 	@Override
@@ -587,7 +580,6 @@ public class AgitService implements AgitUseCase {
 	/**
 	 * 접속 유저가 ACTIVE로 속한 아지트 목록을 조회한다.
 	 *
-	 * <p>TODO(auth): userUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 * 정렬: agit.updated_at DESC (임시). 이후 최근 토픽순(Redis/토픽 서비스)으로 교체한다.
 	 */
 	@Override
@@ -608,7 +600,6 @@ public class AgitService implements AgitUseCase {
 	/**
 	 * 접속 유저의 아지트 멤버 프로필(닉네임·이미지)을 부분 수정한다. ACTIVE만 허용.
 	 *
-	 * <p>TODO(auth): userUuid는 Gateway/JWT에서 추출하도록 교체한다.
 	 */
 	@Override
 	@Transactional

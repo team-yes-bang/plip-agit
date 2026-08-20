@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 public class UpdateAgitRequestDto {
 
-	/** TODO: 인증 연동 후 Gateway/JWT에서 추출한 userUuid로 교체한다. */
+	/** 인증된 요청자의 userUuid. */
 	private final UUID userUuid;
 	private final String agitName;
 	private final String description;
