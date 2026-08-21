@@ -16,6 +16,7 @@ public class AgitDetailResultDto {
 	private final String agitName;
 	private final String description;
 	private final String thumbnailPath;
+	private final String code;
 	private final AgitStatus status;
 	private final int maximumCapacity;
 	private final long currentMemberCount;

@@ -155,7 +155,7 @@ public class AgitService implements AgitUseCase {
 
 	/**
 	 * 아지트 상세를 Mongo 읽기 모델에서 조회한다. miss면 MySQL로 refresh 후 재조회한다.
-	 * ACTIVE 멤버만 허용한다. 응답에 초대 코드는 포함하지 않는다.
+	 * ACTIVE 멤버만 허용한다. 응답에 Mongo 읽기 문서의 초대 코드를 포함한다.
 	 */
 	@Override
 	public AgitDetailResultDto getAgit(UUID agitUuid, UUID actorUserUuid) {
@@ -231,6 +231,7 @@ public class AgitService implements AgitUseCase {
 				.agitName(snapshot.agitName())
 				.description(snapshot.description())
 				.thumbnailPath(snapshot.thumbnailPath())
+				.code(snapshot.code())
 				.status(snapshot.status())
 				.maximumCapacity(snapshot.maximumCapacity())
 				.currentMemberCount(snapshot.members().size())
