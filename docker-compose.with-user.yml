@@ -1,0 +1,74 @@
+# agit 인프라 + user 앱. 유저 레포는 include만 하고 수정하지 않음.
+# 전제: ../plip-user 가 sibling 으로 있음.
+# 사용: docker compose -f docker-compose.with-user.yml up -d --build
+# user API: http://localhost:${USER_SERVER_PORT:-8081}
+# agit 는 기존처럼 IDE bootRun (local 프로필)
+include:
+  - path: docker-compose.yml
+  - path: ../plip-user/docker-compose.app.yml
+
+networks:
+  plip-net:
+    name: plip-net
+
+services:
+  mysql:
+    networks:
+      - plip-net
+    volumes:
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+
+  kafka:
+    networks:
+      - plip-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: plip-agit-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - plip-net
+
+  user:
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      MYSQL_DATABASE: plip_user
+      MYSQL_HOST: mysql
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JWT_SECRET: ${JWT_SECRET:-change-me-local-dev-only}
+      EUREKA_CLIENT_ENABLED: "false"
+      SERVER_PORT: "8080"
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/plip_user?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-root}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: "6379"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      SPRING_MAIL_PORT: ${MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME:-}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
+      MAIL_FROM: ${MAIL_FROM:-${MAIL_USERNAME:-}}
+    ports: !override
+      - "${USER_SERVER_PORT:-8081}:8080"
+    networks:
+      - plip-net
