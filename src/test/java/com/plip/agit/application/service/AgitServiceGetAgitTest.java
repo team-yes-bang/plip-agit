@@ -70,6 +70,7 @@ class AgitServiceGetAgitTest {
 
 		assertEquals(agitUuid, result.getAgitUuid());
 		assertEquals("주말 보드게임", result.getAgitName());
+		assertEquals("A1B2C3", result.getCode());
 		assertEquals(AgitMemberRole.HOST, result.getMyRole());
 		assertEquals("보드왕", result.getHostNickname());
 		assertEquals(1, result.getTopics().size());

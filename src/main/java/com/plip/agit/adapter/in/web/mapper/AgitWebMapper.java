@@ -64,6 +64,7 @@ public class AgitWebMapper {
 				.agitName(resultDto.getAgitName())
 				.description(resultDto.getDescription())
 				.thumbnailPath(resultDto.getThumbnailPath())
+				.code(resultDto.getCode())
 				.status(resultDto.getStatus())
 				.maximumCapacity(resultDto.getMaximumCapacity())
 				.currentMemberCount(resultDto.getCurrentMemberCount())

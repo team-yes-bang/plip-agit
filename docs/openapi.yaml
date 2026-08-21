@@ -27,14 +27,14 @@ paths:
               $ref: "#/components/schemas/CreateAgitRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -45,8 +45,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -79,14 +79,14 @@ paths:
               $ref: "#/components/schemas/JoinAgitRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -97,8 +97,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -131,14 +131,14 @@ paths:
           type: string
           format: uuid
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -149,8 +149,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -177,14 +177,14 @@ paths:
           type: string
           format: uuid
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -195,8 +195,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -225,14 +225,14 @@ paths:
           type: string
           format: uuid
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -243,8 +243,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -273,14 +273,14 @@ paths:
           type: integer
           format: int64
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -291,8 +291,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -321,14 +321,14 @@ paths:
           type: integer
           format: int64
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -339,8 +339,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -364,14 +364,14 @@ paths:
           type: string
           format: uuid
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -382,8 +382,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -406,14 +406,14 @@ paths:
           type: string
           format: uuid
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -424,8 +424,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -441,8 +441,8 @@ paths:
       tags:
       - Agit
       summary: 아지트 상세 조회
-      description: "ACTIVE 멤버가 아지트 상세(메타·멤버·묶인 토픽)를 조회합니다. Mongo 읽기 모델을 우선하고, 없으면\
-        \ MySQL에서 읽기 모델을 채운 뒤 반환합니다. 액터는 Access JWT에서 추출합니다. 초대 코드는 포함하지 않습니다."
+      description: "ACTIVE 멤버가 아지트 상세(메타·멤버·묶인 토픽·초대 코드)를 조회합니다. Mongo 읽기 모델을 우선하고\
+        , 없으면 MySQL에서 읽기 모델을 채운 뒤 반환합니다. 액터는 Access JWT에서 추출합니다."
       operationId: getAgit
       parameters:
       - name: agitUuid
@@ -452,14 +452,14 @@ paths:
           type: string
           format: uuid
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -470,8 +470,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -503,14 +503,14 @@ paths:
               $ref: "#/components/schemas/UpdateAgitRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -521,8 +521,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -555,14 +555,14 @@ paths:
               $ref: "#/components/schemas/UpdateMyMemberProfileRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -573,8 +573,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -599,14 +599,14 @@ paths:
         schema:
           type: string
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -617,8 +617,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -645,14 +645,14 @@ paths:
           type: string
           format: uuid
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -663,8 +663,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -682,19 +682,18 @@ paths:
       tags:
       - Agit
       summary: 내 아지트 목록 조회
-      description: "접속 유저가 ACTIVE로 속한 아지트 목록(제목·UUID)을 반환합니다. Mongo\
-        \ 읽기 문서를 조회하며, 정렬은 updatedAt 내림차순(임시)입니다. 이후 최근 토픽순으로\
-        \ 교체 예정입니다. 액터는 Access JWT에서 추출합니다."
+      description: "접속 유저가 ACTIVE로 속한 아지트 목록(제목·UUID)을 반환합니다. Mongo 읽기 문서를 조회하며, 정\
+        렬은 updatedAt 내림차순(임시)입니다. 이후 최근 토픽순으로 교체 예정입니다. 액터는 Access JWT에서 추출합니다."
       operationId: listMyAgits
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -705,8 +704,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -725,14 +724,14 @@ paths:
       - test-controller
       operationId: test
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -743,8 +742,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -761,14 +760,14 @@ paths:
       - test-controller
       operationId: ping
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -779,8 +778,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
@@ -1060,6 +1059,10 @@ components:
           type: string
           description: 섬네일 경로
           example: agits/thumbnails/sample.png
+        code:
+          type: string
+          description: 초대 코드
+          example: AB12CD
         status:
           type: string
           description: 아지트 상태

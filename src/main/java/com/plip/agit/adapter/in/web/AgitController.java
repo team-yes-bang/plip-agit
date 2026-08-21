@@ -77,9 +77,9 @@ public class AgitController {
 
 	@Operation(
 			summary = "아지트 상세 조회",
-			description = "ACTIVE 멤버가 아지트 상세(메타·멤버·묶인 토픽)를 조회합니다. "
+			description = "ACTIVE 멤버가 아지트 상세(메타·멤버·묶인 토픽·초대 코드)를 조회합니다. "
 					+ "Mongo 읽기 모델을 우선하고, 없으면 MySQL에서 읽기 모델을 채운 뒤 반환합니다. "
-					+ "액터는 Access JWT에서 추출합니다. 초대 코드는 포함하지 않습니다."
+					+ "액터는 Access JWT에서 추출합니다."
 	)
 	@GetMapping("/{agitUuid}")
 	public AgitDetailResponse getAgit(@PathVariable UUID agitUuid) {
