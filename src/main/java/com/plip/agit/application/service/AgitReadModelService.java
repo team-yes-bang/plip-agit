@@ -8,7 +8,6 @@ import com.plip.agit.application.port.out.AgitPersistencePort;
 import com.plip.agit.application.port.out.AgitReadMemberSnapshot;
 import com.plip.agit.application.port.out.AgitReadPersistencePort;
 import com.plip.agit.application.port.out.AgitReadSnapshot;
-import com.plip.agit.application.port.out.AgitReadTopicSnapshot;
 import com.plip.agit.domain.model.Agit;
 import com.plip.agit.domain.model.AgitMemberProfile;
 import java.time.Instant;
@@ -89,9 +88,6 @@ public class AgitReadModelService
 				.stream()
 				.map(this::toMemberSnapshot)
 				.toList();
-		List<AgitReadTopicSnapshot> topics = agitReadPersistencePort.findByAgitUuid(agit.getAgitUuid())
-				.map(AgitReadSnapshot::topics)
-				.orElse(List.of());
 		agitReadPersistencePort.replace(new AgitReadSnapshot(
 				agit.getAgitUuid(),
 				agit.getAgitName(),
@@ -101,7 +97,7 @@ public class AgitReadModelService
 				agit.getStatus(),
 				agit.getMaximumCapacity(),
 				members,
-				topics,
+				List.of(),
 				Instant.now()
 		));
 	}

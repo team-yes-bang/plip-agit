@@ -13,6 +13,10 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,10 +27,23 @@ public class AgitReadPersistenceAdapter implements AgitReadPersistencePort {
 	private static final String ACTIVE = AgitStatus.ACTIVE.name();
 
 	private final AgitReadMongoRepository agitReadMongoRepository;
+	private final MongoTemplate mongoTemplate;
 
 	@Override
 	public void replace(AgitReadSnapshot snapshot) {
-		agitReadMongoRepository.save(toDocument(snapshot));
+		List<AgitReadMemberDocument> members = toMemberDocuments(snapshot.members());
+		Query query = Query.query(Criteria.where("_id").is(snapshot.agitUuid().toString()));
+		Update update = new Update()
+				.set("agitName", snapshot.agitName())
+				.set("description", snapshot.description())
+				.set("thumbnailPath", snapshot.thumbnailPath())
+				.set("code", snapshot.code())
+				.set("status", snapshot.status().name())
+				.set("maximumCapacity", snapshot.maximumCapacity())
+				.set("members", members)
+				.set("updatedAt", snapshot.updatedAt())
+				.setOnInsert("topics", List.of());
+		mongoTemplate.upsert(query, update, AgitReadDocument.class);
 	}
 
 	@Override
@@ -88,8 +105,8 @@ public class AgitReadPersistenceAdapter implements AgitReadPersistencePort {
 		return true;
 	}
 
-	private AgitReadDocument toDocument(AgitReadSnapshot snapshot) {
-		List<AgitReadMemberDocument> members = snapshot.members().stream()
+	private List<AgitReadMemberDocument> toMemberDocuments(List<AgitReadMemberSnapshot> members) {
+		return members.stream()
 				.map(member -> new AgitReadMemberDocument(
 						member.userUuid().toString(),
 						member.nickname(),
@@ -97,21 +114,6 @@ public class AgitReadPersistenceAdapter implements AgitReadPersistencePort {
 						member.role().name()
 				))
 				.toList();
-		List<AgitReadTopicDocument> topics = snapshot.topics().stream()
-				.map(topic -> new AgitReadTopicDocument(topic.topicId(), topic.startedAt()))
-				.toList();
-		return new AgitReadDocument(
-				snapshot.agitUuid().toString(),
-				snapshot.agitName(),
-				snapshot.description(),
-				snapshot.thumbnailPath(),
-				snapshot.code(),
-				snapshot.status().name(),
-				snapshot.maximumCapacity(),
-				members,
-				topics,
-				snapshot.updatedAt()
-		);
 	}
 
 	private AgitReadSnapshot toSnapshot(AgitReadDocument document) {
