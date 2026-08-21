@@ -8,6 +8,7 @@ import com.plip.agit.application.port.out.AgitPersistencePort;
 import com.plip.agit.application.port.out.AgitReadMemberSnapshot;
 import com.plip.agit.application.port.out.AgitReadPersistencePort;
 import com.plip.agit.application.port.out.AgitReadSnapshot;
+import com.plip.agit.application.port.out.AgitReadTopicSnapshot;
 import com.plip.agit.domain.model.Agit;
 import com.plip.agit.domain.model.AgitMemberProfile;
 import java.time.Instant;
