@@ -1,7 +1,6 @@
 package com.plip.agit.adapter.out.persistence;
 
 import com.plip.agit.adapter.out.persistence.mapper.AgitMemberProfileEntityMapper;
-import com.plip.agit.application.port.out.ActiveMembershipAgit;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.domain.model.AgitMemberProfile;
 import java.time.LocalDateTime;
@@ -75,15 +74,5 @@ public class AgitMemberProfilePersistenceAdapter implements AgitMemberProfilePer
 	@Override
 	public long countActiveByAgitId(Long agitId) {
 		return agitMemberProfileRepository.countByAgitIdAndStatus(agitId, AgitMemberStatus.ACTIVE);
-	}
-
-	@Override
-	public List<ActiveMembershipAgit> findActiveMembershipAgitsByUserUuid(UUID userUuid) {
-		// 정렬: agit.updated_at DESC (임시). 이후 최근 토픽순(Redis/토픽 서비스)으로 교체한다.
-		return agitMemberProfileRepository
-				.findActiveMembershipAgitsByUserUuid(userUuid, AgitMemberStatus.ACTIVE, AgitStatus.ACTIVE)
-				.stream()
-				.map(row -> new ActiveMembershipAgit(row.agitUuid(), row.agitName()))
-				.toList();
 	}
 }

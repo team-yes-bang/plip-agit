@@ -89,9 +89,6 @@ public class AgitReadModelService
 				.stream()
 				.map(this::toMemberSnapshot)
 				.toList();
-		List<AgitReadTopicSnapshot> topics = agitReadPersistencePort.findByAgitUuid(agit.getAgitUuid())
-				.map(AgitReadSnapshot::topics)
-				.orElse(List.of());
 		agitReadPersistencePort.replace(new AgitReadSnapshot(
 				agit.getAgitUuid(),
 				agit.getAgitName(),
@@ -101,7 +98,7 @@ public class AgitReadModelService
 				agit.getStatus(),
 				agit.getMaximumCapacity(),
 				members,
-				topics,
+				List.of(),
 				Instant.now()
 		));
 	}

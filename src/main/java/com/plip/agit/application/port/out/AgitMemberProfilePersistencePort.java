@@ -18,9 +18,4 @@ public interface AgitMemberProfilePersistencePort {
 	List<AgitMemberProfile> findActiveByAgitId(Long agitId);
 
 	long countActiveByAgitId(Long agitId);
-
-	/**
-	 * ACTIVE 멤버십·ACTIVE 아지트 목록. 정렬은 agit.updated_at DESC(임시).
-	 */
-	List<ActiveMembershipAgit> findActiveMembershipAgitsByUserUuid(UUID userUuid);
 }

@@ -1,8 +1,10 @@
 package com.plip.agit.support;
 
+import com.plip.agit.application.port.out.ActiveMembershipAgit;
 import com.plip.agit.application.port.out.AgitReadPersistencePort;
 import com.plip.agit.application.port.out.AgitReadSnapshot;
 import com.plip.agit.application.port.out.AgitReadTopicSnapshot;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +30,11 @@ public class TestAgitReadPersistenceConfig {
 			@Override
 			public Optional<AgitReadSnapshot> findActiveByCode(String code) {
 				return Optional.empty();
+			}
+
+			@Override
+			public List<ActiveMembershipAgit> findActiveByMemberUserUuid(UUID userUuid) {
+				return List.of();
 			}
 
 			@Override

@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,7 +79,7 @@ class AgitServiceMyAgitsAndProfileTest {
 
 	@Test
 	void listMyAgits_returnsMappedItems() {
-		when(agitMemberProfilePersistencePort.findActiveMembershipAgitsByUserUuid(userUuid))
+		when(agitReadPersistencePort.findActiveByMemberUserUuid(userUuid))
 				.thenReturn(List.of(new ActiveMembershipAgit(agitUuid, "주말 보드게임")));
 
 		List<MyAgitItemDto> result = agitService.listMyAgits(userUuid);
@@ -84,6 +87,7 @@ class AgitServiceMyAgitsAndProfileTest {
 		assertEquals(1, result.size());
 		assertEquals(agitUuid, result.get(0).getAgitUuid());
 		assertEquals("주말 보드게임", result.get(0).getAgitName());
+		verifyNoInteractions(agitMemberProfilePersistencePort);
 	}
 
 	@Test
@@ -126,6 +130,39 @@ class AgitServiceMyAgitsAndProfileTest {
 				eq(agitUuid.toString()),
 				anyString()
 		);
+		verify(refreshAgitReadModelUseCase).refresh(agitUuid);
+	}
+
+	@Test
+	void updateMyMemberProfile_keepsWriteWhenRefreshFails() {
+		Agit agit = Agit.reconstitute(
+				10L, agitUuid, "주말 보드게임", "소개", 5, "AB12CD", AgitStatus.ACTIVE, null
+		);
+		AgitMemberProfile profile = AgitMemberProfile.reconstitute(
+				1L, 10L, userUuid, "보드왕", "profiles/old.png",
+				AgitMemberStatus.ACTIVE, AgitMemberRole.GUEST, null
+		);
+		AgitMemberProfile saved = AgitMemberProfile.reconstitute(
+				1L, 10L, userUuid, "새닉네임", "profiles/old.png",
+				AgitMemberStatus.ACTIVE, AgitMemberRole.GUEST, null
+		);
+
+		when(agitPersistencePort.findByAgitUuid(agitUuid)).thenReturn(Optional.of(agit));
+		when(agitMemberProfilePersistencePort.findByAgitIdAndUserUuid(10L, userUuid))
+				.thenReturn(Optional.of(profile));
+		when(agitMemberProfilePersistencePort.save(any(AgitMemberProfile.class))).thenReturn(saved);
+		doThrow(new RuntimeException("mongo down")).when(refreshAgitReadModelUseCase).refresh(agitUuid);
+
+		UpdateMyMemberProfileResultDto result = agitService.updateMyMemberProfile(
+				agitUuid,
+				UpdateMyMemberProfileRequestDto.builder()
+						.userUuid(userUuid)
+						.nickname("새닉네임")
+						.build()
+		);
+
+		assertEquals("새닉네임", result.getNickname());
+		verify(agitMemberProfilePersistencePort).save(any(AgitMemberProfile.class));
 	}
 
 	@Test
@@ -152,6 +189,7 @@ class AgitServiceMyAgitsAndProfileTest {
 								.build()
 				)
 		);
+		verify(refreshAgitReadModelUseCase, never()).refresh(any());
 	}
 
 	@Test
@@ -174,5 +212,6 @@ class AgitServiceMyAgitsAndProfileTest {
 								.build()
 				)
 		);
+		verify(refreshAgitReadModelUseCase, never()).refresh(any());
 	}
 }
