@@ -1,5 +1,6 @@
 package com.plip.agit.adapter.out.persistence.mongodb;
 
+import com.plip.agit.application.port.out.ActiveMembershipAgit;
 import com.plip.agit.application.port.out.AgitReadMemberSnapshot;
 import com.plip.agit.application.port.out.AgitReadPersistencePort;
 import com.plip.agit.application.port.out.AgitReadSnapshot;
@@ -56,6 +57,18 @@ public class AgitReadPersistenceAdapter implements AgitReadPersistencePort {
 	public Optional<AgitReadSnapshot> findActiveByCode(String code) {
 		return agitReadMongoRepository.findByCodeAndStatus(code, ACTIVE)
 				.map(this::toSnapshot);
+	}
+
+	@Override
+	public List<ActiveMembershipAgit> findActiveByMemberUserUuid(UUID userUuid) {
+		return agitReadMongoRepository
+				.findByStatusAndMembersUserUuidOrderByUpdatedAtDesc(ACTIVE, userUuid.toString())
+				.stream()
+				.map(document -> new ActiveMembershipAgit(
+						UUID.fromString(document.getId()),
+						document.getAgitName()
+				))
+				.toList();
 	}
 
 	@Override

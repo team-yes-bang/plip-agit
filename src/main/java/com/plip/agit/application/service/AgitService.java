@@ -575,16 +575,16 @@ public class AgitService implements AgitUseCase {
 	}
 
 	/**
-	 * 접속 유저가 ACTIVE로 속한 아지트 목록을 조회한다.
+	 * 접속 유저가 ACTIVE로 속한 아지트 목록을 Mongo 읽기 문서에서 조회한다.
 	 *
-	 * 정렬: agit.updated_at DESC (임시). 이후 최근 토픽순(Redis/토픽 서비스)으로 교체한다.
+	 * 정렬: updatedAt DESC (임시). 이후 최근 토픽순으로 교체한다.
 	 */
 	@Override
 	public List<MyAgitItemDto> listMyAgits(UUID userUuid) {
 		requireActorUserUuid(userUuid);
 
 		List<ActiveMembershipAgit> rows =
-				agitMemberProfilePersistencePort.findActiveMembershipAgitsByUserUuid(userUuid);
+				agitReadPersistencePort.findActiveByMemberUserUuid(userUuid);
 
 		return rows.stream()
 				.map(row -> MyAgitItemDto.builder()

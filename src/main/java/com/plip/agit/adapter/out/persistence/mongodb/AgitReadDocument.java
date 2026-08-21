@@ -17,7 +17,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Document(collection = "agit_read_models")
 @CompoundIndexes({
-		@CompoundIndex(name = "idx_members_userUuid", def = "{'members.userUuid': 1}"),
+		@CompoundIndex(
+				name = "idx_members_userUuid_status_updatedAt",
+				def = "{'members.userUuid': 1, 'status': 1, 'updatedAt': -1}"
+		),
 		@CompoundIndex(name = "idx_status", def = "{'status': 1}"),
 		@CompoundIndex(name = "idx_topics_topicId", def = "{'topics.topicId': 1}")
 })

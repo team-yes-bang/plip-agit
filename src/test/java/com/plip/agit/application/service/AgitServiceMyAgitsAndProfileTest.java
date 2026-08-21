@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -78,7 +79,7 @@ class AgitServiceMyAgitsAndProfileTest {
 
 	@Test
 	void listMyAgits_returnsMappedItems() {
-		when(agitMemberProfilePersistencePort.findActiveMembershipAgitsByUserUuid(userUuid))
+		when(agitReadPersistencePort.findActiveByMemberUserUuid(userUuid))
 				.thenReturn(List.of(new ActiveMembershipAgit(agitUuid, "주말 보드게임")));
 
 		List<MyAgitItemDto> result = agitService.listMyAgits(userUuid);
@@ -86,6 +87,7 @@ class AgitServiceMyAgitsAndProfileTest {
 		assertEquals(1, result.size());
 		assertEquals(agitUuid, result.get(0).getAgitUuid());
 		assertEquals("주말 보드게임", result.get(0).getAgitName());
+		verifyNoInteractions(agitMemberProfilePersistencePort);
 	}
 
 	@Test
