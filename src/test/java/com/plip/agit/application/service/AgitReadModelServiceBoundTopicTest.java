@@ -62,6 +62,7 @@ class AgitReadModelServiceBoundTopicTest {
 		org.junit.jupiter.api.Assertions.assertTrue(saved.topics().isEmpty());
 		org.junit.jupiter.api.Assertions.assertEquals("주말 보드게임", saved.agitName());
 		org.junit.jupiter.api.Assertions.assertEquals(1, saved.members().size());
+		org.junit.jupiter.api.Assertions.assertEquals(10L, saved.members().get(0).ampId());
 	}
 
 	@Test

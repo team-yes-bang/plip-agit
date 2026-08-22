@@ -73,9 +73,25 @@ class AgitServiceGetAgitTest {
 		assertEquals("A1B2C3", result.getCode());
 		assertEquals(AgitMemberRole.HOST, result.getMyRole());
 		assertEquals("보드왕", result.getHostNickname());
+		assertEquals(10L, result.getMembers().get(0).getAmpId());
 		assertEquals(1, result.getTopics().size());
 		assertEquals("topic-1", result.getTopics().get(0).getTopicId());
 		verify(refreshAgitReadModelUseCase, never()).refresh(agitUuid);
+	}
+
+	@Test
+	void getAgit_refreshesWhenAmpIdMissing() {
+		UUID agitUuid = UUID.randomUUID();
+		UUID hostUuid = UUID.randomUUID();
+		AgitReadSnapshot stale = snapshot(agitUuid, hostUuid, AgitStatus.ACTIVE, null);
+		AgitReadSnapshot fresh = snapshot(agitUuid, hostUuid, AgitStatus.ACTIVE, 10L);
+		when(agitReadPersistencePort.findByAgitUuid(agitUuid))
+				.thenReturn(Optional.of(stale), Optional.of(fresh));
+
+		AgitDetailResultDto result = agitService.getAgit(agitUuid, hostUuid);
+
+		assertEquals(10L, result.getMembers().get(0).getAmpId());
+		verify(refreshAgitReadModelUseCase).refresh(agitUuid);
 	}
 
 	@Test
@@ -130,6 +146,10 @@ class AgitServiceGetAgitTest {
 	}
 
 	private AgitReadSnapshot snapshot(UUID agitUuid, UUID hostUuid, AgitStatus status) {
+		return snapshot(agitUuid, hostUuid, status, 10L);
+	}
+
+	private AgitReadSnapshot snapshot(UUID agitUuid, UUID hostUuid, AgitStatus status, Long ampId) {
 		return new AgitReadSnapshot(
 				agitUuid,
 				"주말 보드게임",
@@ -138,7 +158,7 @@ class AgitServiceGetAgitTest {
 				"A1B2C3",
 				status,
 				5,
-				List.of(new AgitReadMemberSnapshot(hostUuid, "보드왕", null, AgitMemberRole.HOST)),
+				List.of(new AgitReadMemberSnapshot(ampId, hostUuid, "보드왕", null, AgitMemberRole.HOST)),
 				List.of(new AgitReadTopicSnapshot("topic-1", Instant.parse("2026-08-14T00:00:00Z"))),
 				Instant.parse("2026-08-14T00:00:00Z")
 		);

@@ -73,8 +73,8 @@ class AgitServiceLandingTest {
 				AgitStatus.ACTIVE,
 				5,
 				List.of(
-						new AgitReadMemberSnapshot(hostUuid, "보드왕", null, AgitMemberRole.HOST),
-						new AgitReadMemberSnapshot(UUID.randomUUID(), "게스트", null, AgitMemberRole.GUEST)
+						new AgitReadMemberSnapshot(10L, hostUuid, "보드왕", null, AgitMemberRole.HOST),
+						new AgitReadMemberSnapshot(11L, UUID.randomUUID(), "게스트", null, AgitMemberRole.GUEST)
 				),
 				List.of(),
 				Instant.parse("2026-08-14T00:00:00Z")
@@ -134,7 +134,7 @@ class AgitServiceLandingTest {
 				AgitStatus.ACTIVE,
 				5,
 				List.of(new AgitReadMemberSnapshot(
-						UUID.randomUUID(), "게스트", null, AgitMemberRole.GUEST
+						11L, UUID.randomUUID(), "게스트", null, AgitMemberRole.GUEST
 				)),
 				List.of(),
 				Instant.parse("2026-08-14T00:00:00Z")
