@@ -55,6 +55,9 @@ public class AgitDetailResponse {
 	@Schema(description = "아지트 멤버")
 	public static class Member {
 
+		@Schema(description = "아지트 멤버 프로필 ID (추방·위임 경로 ampId)", example = "10")
+		private Long ampId;
+
 		@Schema(description = "유저 UUID", example = "018f3f6e-8e2a-7b3c-9d4e-5f6a7b8c9d0e")
 		private UUID userUuid;
 

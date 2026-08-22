@@ -27,26 +27,26 @@ paths:
               $ref: "#/components/schemas/CreateAgitRequest"
         required: true
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -79,26 +79,26 @@ paths:
               $ref: "#/components/schemas/JoinAgitRequest"
         required: true
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -131,26 +131,26 @@ paths:
           type: string
           format: uuid
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -177,26 +177,26 @@ paths:
           type: string
           format: uuid
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -225,26 +225,26 @@ paths:
           type: string
           format: uuid
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -273,26 +273,26 @@ paths:
           type: integer
           format: int64
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -321,26 +321,26 @@ paths:
           type: integer
           format: int64
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -364,26 +364,26 @@ paths:
           type: string
           format: uuid
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -406,26 +406,26 @@ paths:
           type: string
           format: uuid
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -452,26 +452,26 @@ paths:
           type: string
           format: uuid
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -503,26 +503,26 @@ paths:
               $ref: "#/components/schemas/UpdateAgitRequest"
         required: true
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -555,26 +555,26 @@ paths:
               $ref: "#/components/schemas/UpdateMyMemberProfileRequest"
         required: true
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -599,26 +599,26 @@ paths:
         schema:
           type: string
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -645,26 +645,26 @@ paths:
           type: string
           format: uuid
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -686,26 +686,26 @@ paths:
         렬은 updatedAt 내림차순(임시)입니다. 이후 최근 토픽순으로 교체 예정입니다. 액터는 Access JWT에서 추출합니다."
       operationId: listMyAgits
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -724,26 +724,26 @@ paths:
       - test-controller
       operationId: test
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -760,26 +760,26 @@ paths:
       - test-controller
       operationId: ping
       responses:
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "409":
-          description: Conflict
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict
           content:
             '*/*':
               schema:
@@ -1105,6 +1105,11 @@ components:
       type: object
       description: 아지트 멤버
       properties:
+        ampId:
+          type: integer
+          format: int64
+          description: 아지트 멤버 프로필 ID (추방·위임 경로 ampId)
+          example: 10
         userUuid:
           type: string
           format: uuid

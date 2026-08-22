@@ -105,6 +105,7 @@ public class AgitReadModelService
 
 	private AgitReadMemberSnapshot toMemberSnapshot(AgitMemberProfile profile) {
 		return new AgitReadMemberSnapshot(
+				profile.getId(),
 				profile.getUserUuid(),
 				profile.getNickname(),
 				profile.getProfileImagePath(),

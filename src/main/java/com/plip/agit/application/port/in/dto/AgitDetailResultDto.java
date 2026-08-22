@@ -29,6 +29,7 @@ public class AgitDetailResultDto {
 	@Builder
 	public static class Member {
 
+		private final Long ampId;
 		private final UUID userUuid;
 		private final String nickname;
 		private final String profileImagePath;

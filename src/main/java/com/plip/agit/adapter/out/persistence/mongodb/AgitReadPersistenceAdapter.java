@@ -121,6 +121,7 @@ public class AgitReadPersistenceAdapter implements AgitReadPersistencePort {
 	private List<AgitReadMemberDocument> toMemberDocuments(List<AgitReadMemberSnapshot> members) {
 		return members.stream()
 				.map(member -> new AgitReadMemberDocument(
+						member.ampId(),
 						member.userUuid().toString(),
 						member.nickname(),
 						member.profileImagePath(),
@@ -133,6 +134,7 @@ public class AgitReadPersistenceAdapter implements AgitReadPersistencePort {
 		List<AgitReadMemberSnapshot> members = (document.getMembers() != null ? document.getMembers() : List.<AgitReadMemberDocument>of())
 				.stream()
 				.map(member -> new AgitReadMemberSnapshot(
+						member.getAmpId(),
 						UUID.fromString(member.getUserUuid()),
 						member.getNickname(),
 						member.getProfileImagePath(),

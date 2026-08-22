@@ -165,8 +165,8 @@ public class AgitService implements AgitUseCase {
 		}
 
 		Optional<AgitReadSnapshot> found = agitReadPersistencePort.findByAgitUuid(agitUuid);
-		if (found.isEmpty()) {
-			log.info("상세 Mongo miss, 읽기 모델 refresh agitUuid={}", agitUuid);
+		if (found.isEmpty() || membersMissingAmpId(found.get())) {
+			log.info("상세 Mongo miss 또는 ampId 없음, 읽기 모델 refresh agitUuid={}", agitUuid);
 			refreshAgitReadModelUseCase.refresh(agitUuid);
 			found = agitReadPersistencePort.findByAgitUuid(agitUuid);
 		}
@@ -187,6 +187,10 @@ public class AgitService implements AgitUseCase {
 				.orElseThrow(AgitNotFoundException::new);
 
 		return toDetailResult(snapshot, host, me);
+	}
+
+	private boolean membersMissingAmpId(AgitReadSnapshot snapshot) {
+		return snapshot.members().stream().anyMatch(member -> member.ampId() == null);
 	}
 
 	private Optional<AgitLandingResultDto> toLandingFromReadModel(AgitReadSnapshot snapshot) {
@@ -214,6 +218,7 @@ public class AgitService implements AgitUseCase {
 	) {
 		List<AgitDetailResultDto.Member> members = snapshot.members().stream()
 				.map(member -> AgitDetailResultDto.Member.builder()
+						.ampId(member.ampId())
 						.userUuid(member.userUuid())
 						.nickname(member.nickname())
 						.profileImagePath(member.profileImagePath())
