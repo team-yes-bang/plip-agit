@@ -72,6 +72,7 @@ public class AgitWebMapper {
 				.myRole(resultDto.getMyRole())
 				.members(resultDto.getMembers().stream()
 						.map(member -> AgitDetailResponse.Member.builder()
+								.ampId(member.getAmpId())
 								.userUuid(member.getUserUuid())
 								.nickname(member.getNickname())
 								.profileImagePath(member.getProfileImagePath())
