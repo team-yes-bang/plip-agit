@@ -18,6 +18,8 @@ spring:
       - org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration
       - org.springframework.boot.data.mongodb.autoconfigure.DataMongoAutoConfiguration
       - org.springframework.boot.data.mongodb.autoconfigure.DataMongoRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.data.redis.autoconfigure.RedisAutoConfiguration
   jpa:
     hibernate:
       ddl-auto: create-drop
