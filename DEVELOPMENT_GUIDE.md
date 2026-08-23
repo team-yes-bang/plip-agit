@@ -82,6 +82,13 @@ src/main/java/com/plip/{service}/
 
 - 이벤트 스펙은 `docs/events/{event-name}.v1.md`에 Markdown으로 작성합니다.
 
+### 3.3 멤버십 Redis (topic 가드)
+
+- 정본은 MySQL이다. 커밋 후 Hash `agit:{agitUuid}:members` (필드 `userUuid`, 값 `HOST`|`GUEST`)를 맞춘다. TTL 없음.
+- agit만 Hash를 쓴다. topic은 `HGET`만 한다 (배포 시 Redis ACL 읽기 전용).
+- 키 유실 워밍: `GET /internal/v1/agits/{agitUuid}/members` (클러스터 내부, 게이트웨이 미노출). topic은 미스 시 1회만 호출한다.
+- `REDIS_HOST` / `REDIS_PORT`로 **topic과 같은 Redis**를 가리킨다. 로컬 compose `redis` 서비스 포트는 topic과 겹치지 않게 맞춘다.
+
 ---
 
 

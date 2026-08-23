@@ -25,6 +25,7 @@ import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
 import com.plip.agit.application.port.out.AgitReadPersistencePort;
 import com.plip.agit.application.port.out.EventPublisherPort;
+import com.plip.agit.application.port.out.AgitMembershipCachePort;
 import com.plip.agit.domain.model.Agit;
 import com.plip.agit.domain.model.AgitMemberProfile;
 import com.plip.agit.domain.model.AgitMemberRole;
@@ -61,6 +62,9 @@ class AgitServiceMyAgitsAndProfileTest {
 
 	@Mock
 	private EventPublisherPort eventPublisherPort;
+
+	@Mock
+	private AgitMembershipCachePort agitMembershipCachePort;
 
 	@Spy
 	private ObjectMapper objectMapper = new ObjectMapper();

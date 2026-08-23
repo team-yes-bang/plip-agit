@@ -39,7 +39,8 @@ public class SecurityConfig {
 								"/v3/api-docs",
 								"/v3/api-docs/**",
 								"/api/test",
-								"/api/test/**"
+								"/api/test/**",
+								"/internal/v1/agits/**"
 						).permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/agits/*/landing").permitAll()
 						.requestMatchers("/api/v1/agits/**").authenticated()
