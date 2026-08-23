@@ -21,6 +21,10 @@ public class OpenApiConfig {
 								.type(SecurityScheme.Type.HTTP)
 								.scheme("bearer")
 								.bearerFormat("JWT")
+								.description(
+										"Gateway JWT 인증. 클라이언트는 Bearer를 전달하고, "
+												+ "Gateway가 검증 후 downstream에 X-User-UUID를 주입합니다."
+								)
 				))
 				.addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH));
 	}

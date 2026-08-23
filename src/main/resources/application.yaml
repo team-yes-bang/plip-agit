@@ -23,9 +23,6 @@ agit:
   mongo:
     backfill: ${AGIT_MONGO_BACKFILL:false}
 
-jwt:
-  secret: ${JWT_SECRET:}
-
 eureka:
   instance:
     prefer-ip-address: true

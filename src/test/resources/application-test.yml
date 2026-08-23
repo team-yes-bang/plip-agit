@@ -26,6 +26,3 @@ spring:
 eureka:
   client:
     enabled: false
-
-jwt:
-  secret: test-jwt-secret-key-for-unit-tests-only

@@ -31,7 +31,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 				response.getWriter(),
 				ErrorResponse.builder()
 						.code("ACCESS_TOKEN_INVALID")
-						.message("액세스 토큰이 유효하지 않습니다.")
+						.message("인증이 필요합니다.")
 						.build()
 		);
 	}

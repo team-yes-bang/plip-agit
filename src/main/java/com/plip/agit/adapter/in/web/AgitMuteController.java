@@ -28,7 +28,7 @@ public class AgitMuteController {
 
 	@Operation(
 			summary = "아지트 내 유저 뮤트",
-			description = "해당 아지트의 ACTIVE 멤버가 다른 ACTIVE 멤버를 뮤트합니다. 이미 뮤트된 경우 변경 없이 성공합니다. 액터는 Access JWT에서 추출합니다."
+			description = "해당 아지트의 ACTIVE 멤버가 다른 ACTIVE 멤버를 뮤트합니다. 이미 뮤트된 경우 변경 없이 성공합니다. 액터는 Gateway가 주입한 X-User-UUID에서 식별합니다."
 	)
 	@PostMapping("/{agitUuid}/mutes/{mutedUuid}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
@@ -41,7 +41,7 @@ public class AgitMuteController {
 
 	@Operation(
 			summary = "아지트 내 유저 뮤트 해제",
-			description = "본인이 건 뮤트를 해제합니다. 뮤트 관계가 없으면 변경 없이 성공합니다. 액터는 Access JWT에서 추출합니다."
+			description = "본인이 건 뮤트를 해제합니다. 뮤트 관계가 없으면 변경 없이 성공합니다. 액터는 Gateway가 주입한 X-User-UUID에서 식별합니다."
 	)
 	@DeleteMapping("/{agitUuid}/mutes/{mutedUuid}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
@@ -54,7 +54,7 @@ public class AgitMuteController {
 
 	@Operation(
 			summary = "내 뮤트 목록 조회",
-			description = "해당 아지트에서 내가 뮤트한 사용자 UUID 목록을 반환합니다. 액터는 Access JWT에서 추출합니다."
+			description = "해당 아지트에서 내가 뮤트한 사용자 UUID 목록을 반환합니다. 액터는 Gateway가 주입한 X-User-UUID에서 식별합니다."
 	)
 	@GetMapping("/{agitUuid}/mutes")
 	public List<MuteItemResponse> listMyMutes(@PathVariable UUID agitUuid) {
