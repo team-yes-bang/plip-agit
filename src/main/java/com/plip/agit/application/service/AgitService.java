@@ -31,6 +31,7 @@ import com.plip.agit.application.port.in.dto.UpdateMyMemberProfileResultDto;
 import com.plip.agit.application.port.out.ActiveMembershipAgit;
 import com.plip.agit.application.port.out.AgitBanPersistencePort;
 import com.plip.agit.application.port.out.AgitEventTopics;
+import com.plip.agit.application.port.out.AgitMembershipCachePort;
 import com.plip.agit.application.port.out.AgitMemberProfilePersistencePort;
 import com.plip.agit.application.port.out.AgitPersistencePort;
 import com.plip.agit.application.port.out.AgitReadMemberSnapshot;
@@ -74,6 +75,7 @@ public class AgitService implements AgitUseCase {
 	private final AgitBanPersistencePort agitBanPersistencePort;
 	private final AgitReadPersistencePort agitReadPersistencePort;
 	private final RefreshAgitReadModelUseCase refreshAgitReadModelUseCase;
+	private final AgitMembershipCachePort agitMembershipCachePort;
 	private final EventPublisherPort eventPublisherPort;
 	private final ObjectMapper objectMapper;
 	private final SecureRandom secureRandom = new SecureRandom();
@@ -118,6 +120,7 @@ public class AgitService implements AgitUseCase {
 		payload.put("hostNickname", savedProfile.getNickname());
 		publishEvent(AgitEventTopics.CREATED, savedAgit.getAgitUuid(), payload);
 		scheduleReadModelRefresh(savedAgit.getAgitUuid());
+		scheduleMembershipPut(savedAgit.getAgitUuid(), savedProfile.getUserUuid(), savedProfile.getRole());
 
 		return CreateAgitResultDto.builder()
 				.agitUuid(savedAgit.getAgitUuid())
@@ -322,6 +325,7 @@ public class AgitService implements AgitUseCase {
 		joinPayload.put("role", savedProfile.getRole().name());
 		publishEvent(AgitEventTopics.MEMBER_JOINED, agit.getAgitUuid(), joinPayload);
 		scheduleReadModelRefresh(agit.getAgitUuid());
+		scheduleMembershipPut(agit.getAgitUuid(), savedProfile.getUserUuid(), savedProfile.getRole());
 
 		return JoinAgitResultDto.builder()
 				.agitUuid(agit.getAgitUuid())
@@ -377,6 +381,7 @@ public class AgitService implements AgitUseCase {
 		banPayload.put("nickname", target.getNickname());
 		publishEvent(AgitEventTopics.MEMBER_BANNED, agit.getAgitUuid(), banPayload);
 		scheduleReadModelRefresh(agit.getAgitUuid());
+		scheduleMembershipRemove(agit.getAgitUuid(), target.getUserUuid());
 	}
 
 	/**
@@ -412,6 +417,7 @@ public class AgitService implements AgitUseCase {
 			deletedPayload.put("userUuid", actorUserUuid.toString());
 			publishEvent(AgitEventTopics.DELETED, agit.getAgitUuid(), deletedPayload);
 			scheduleReadModelRefresh(agit.getAgitUuid());
+			scheduleMembershipDeleteAll(agit.getAgitUuid());
 			return;
 		}
 
@@ -423,6 +429,7 @@ public class AgitService implements AgitUseCase {
 		leftPayload.put("userUuid", actorUserUuid.toString());
 		publishEvent(AgitEventTopics.MEMBER_LEFT, agit.getAgitUuid(), leftPayload);
 		scheduleReadModelRefresh(agit.getAgitUuid());
+		scheduleMembershipRemove(agit.getAgitUuid(), actorUserUuid);
 	}
 
 	/**
@@ -464,6 +471,7 @@ public class AgitService implements AgitUseCase {
 		unbanPayload.put("userUuid", targetUserUuid.toString());
 		publishEvent(AgitEventTopics.MEMBER_UNBANNED, agit.getAgitUuid(), unbanPayload);
 		scheduleReadModelRefresh(agit.getAgitUuid());
+		scheduleMembershipRemove(agit.getAgitUuid(), targetUserUuid);
 	}
 
 	/**
@@ -550,6 +558,8 @@ public class AgitService implements AgitUseCase {
 		transferPayload.put("newHostNickname", target.getNickname());
 		publishEvent(AgitEventTopics.HOST_TRANSFERRED, agit.getAgitUuid(), transferPayload);
 		scheduleReadModelRefresh(agit.getAgitUuid());
+		scheduleMembershipPut(agit.getAgitUuid(), currentHost.getUserUuid(), AgitMemberRole.GUEST);
+		scheduleMembershipPut(agit.getAgitUuid(), target.getUserUuid(), AgitMemberRole.HOST);
 	}
 
 	/**
@@ -664,6 +674,31 @@ public class AgitService implements AgitUseCase {
 		if (actorUserUuid == null) {
 			throw new IllegalArgumentException("사용자 UUID는 필수입니다.");
 		}
+	}
+
+	private void scheduleMembershipPut(UUID agitUuid, UUID userUuid, AgitMemberRole role) {
+		runAfterCommit(() -> agitMembershipCachePort.put(agitUuid, userUuid, role));
+	}
+
+	private void scheduleMembershipRemove(UUID agitUuid, UUID userUuid) {
+		runAfterCommit(() -> agitMembershipCachePort.remove(agitUuid, userUuid));
+	}
+
+	private void scheduleMembershipDeleteAll(UUID agitUuid) {
+		runAfterCommit(() -> agitMembershipCachePort.deleteAll(agitUuid));
+	}
+
+	private void runAfterCommit(Runnable action) {
+		if (TransactionSynchronizationManager.isSynchronizationActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					action.run();
+				}
+			});
+			return;
+		}
+		action.run();
 	}
 
 	private void scheduleReadModelRefresh(UUID agitUuid) {

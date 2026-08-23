@@ -19,6 +19,7 @@ import com.plip.agit.application.port.out.AgitReadPersistencePort;
 import com.plip.agit.application.port.out.AgitReadSnapshot;
 import com.plip.agit.application.port.out.AgitReadTopicSnapshot;
 import com.plip.agit.application.port.out.EventPublisherPort;
+import com.plip.agit.application.port.out.AgitMembershipCachePort;
 import com.plip.agit.domain.model.AgitMemberRole;
 import com.plip.agit.domain.model.AgitStatus;
 import java.time.Instant;
@@ -52,6 +53,9 @@ class AgitServiceGetAgitTest {
 
 	@Mock
 	private EventPublisherPort eventPublisherPort;
+
+	@Mock
+	private AgitMembershipCachePort agitMembershipCachePort;
 
 	@Spy
 	private ObjectMapper objectMapper = new ObjectMapper();
