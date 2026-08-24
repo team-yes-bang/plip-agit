@@ -5,6 +5,7 @@ import com.plip.agit.application.port.out.AgitReadMemberSnapshot;
 import com.plip.agit.application.port.out.AgitReadPersistencePort;
 import com.plip.agit.application.port.out.AgitReadSnapshot;
 import com.plip.agit.application.port.out.AgitReadTopicSnapshot;
+import com.plip.agit.application.service.AgitReadTopicWindow;
 import com.plip.agit.domain.model.AgitMemberRole;
 import com.plip.agit.domain.model.AgitStatus;
 import java.time.Instant;
@@ -78,21 +79,8 @@ public class AgitReadPersistenceAdapter implements AgitReadPersistencePort {
 			return false;
 		}
 		AgitReadDocument document = existing.get();
-		List<AgitReadTopicDocument> topics = new ArrayList<>(
-				document.getTopics() != null ? document.getTopics() : List.of()
-		);
-		Optional<AgitReadTopicDocument> matched = topics.stream()
-				.filter(item -> topic.topicId().equals(item.getTopicId()))
-				.findFirst();
-		if (matched.isPresent()) {
-			AgitReadTopicDocument current = matched.get();
-			if (topic.startedAt() != null) {
-				current.setStartedAt(topic.startedAt());
-			}
-		} else {
-			topics.add(new AgitReadTopicDocument(topic.topicId(), topic.startedAt()));
-		}
-		document.setTopics(topics);
+		List<AgitReadTopicSnapshot> windowed = AgitReadTopicWindow.upsert(toTopicSnapshots(document), topic);
+		document.setTopics(toTopicDocuments(windowed));
 		document.setUpdatedAt(Instant.now());
 		agitReadMongoRepository.save(document);
 		return true;
@@ -118,6 +106,19 @@ public class AgitReadPersistenceAdapter implements AgitReadPersistencePort {
 		return true;
 	}
 
+	private List<AgitReadTopicSnapshot> toTopicSnapshots(AgitReadDocument document) {
+		return (document.getTopics() != null ? document.getTopics() : List.<AgitReadTopicDocument>of())
+				.stream()
+				.map(topic -> new AgitReadTopicSnapshot(topic.getTopicId(), topic.getStartedAt()))
+				.toList();
+	}
+
+	private List<AgitReadTopicDocument> toTopicDocuments(List<AgitReadTopicSnapshot> topics) {
+		return topics.stream()
+				.map(topic -> new AgitReadTopicDocument(topic.topicId(), topic.startedAt()))
+				.toList();
+	}
+
 	private List<AgitReadMemberDocument> toMemberDocuments(List<AgitReadMemberSnapshot> members) {
 		return members.stream()
 				.map(member -> new AgitReadMemberDocument(
@@ -141,10 +142,7 @@ public class AgitReadPersistenceAdapter implements AgitReadPersistencePort {
 						AgitMemberRole.valueOf(member.getRole())
 				))
 				.toList();
-		List<AgitReadTopicSnapshot> topics = (document.getTopics() != null ? document.getTopics() : List.<AgitReadTopicDocument>of())
-				.stream()
-				.map(topic -> new AgitReadTopicSnapshot(topic.getTopicId(), topic.getStartedAt()))
-				.toList();
+		List<AgitReadTopicSnapshot> topics = AgitReadTopicWindow.trim(toTopicSnapshots(document));
 		return new AgitReadSnapshot(
 				UUID.fromString(document.getId()),
 				document.getAgitName(),
