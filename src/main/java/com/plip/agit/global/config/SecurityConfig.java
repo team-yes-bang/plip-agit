@@ -42,7 +42,7 @@ public class SecurityConfig {
 								"/api/test/**",
 								"/internal/v1/agits/**"
 						).permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/v1/agits/*/landing").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/agits/*/landing", "/api/v1/agits/**/landing").permitAll()
 						.requestMatchers("/api/v1/agits/**").authenticated()
 						.anyRequest().permitAll()
 				)
