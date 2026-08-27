@@ -1,6 +1,7 @@
 package com.plip.agit.application.port.out;
 
 import com.plip.agit.domain.model.AgitMemberProfile;
+import com.plip.agit.domain.model.AgitMemberStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,6 +17,8 @@ public interface AgitMemberProfilePersistencePort {
 	Optional<AgitMemberProfile> findActiveHostByAgitId(Long agitId);
 
 	List<AgitMemberProfile> findActiveByAgitId(Long agitId);
+
+	List<AgitMemberProfile> findByAgitIdAndStatus(Long agitId, AgitMemberStatus status);
 
 	long countActiveByAgitId(Long agitId);
 }

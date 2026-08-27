@@ -57,8 +57,16 @@ public class AgitMemberProfilePersistenceAdapter implements AgitMemberProfilePer
 
 	@Override
 	public List<AgitMemberProfile> findActiveByAgitId(Long agitId) {
+		return findByAgitIdAndStatus(agitId, com.plip.agit.domain.model.AgitMemberStatus.ACTIVE);
+	}
+
+	@Override
+	public List<AgitMemberProfile> findByAgitIdAndStatus(
+			Long agitId,
+			com.plip.agit.domain.model.AgitMemberStatus status
+	) {
 		return agitMemberProfileRepository
-				.findByAgitIdAndStatus(agitId, AgitMemberStatus.ACTIVE)
+				.findByAgitIdAndStatus(agitId, agitMemberProfileEntityMapper.toEntityStatus(status))
 				.stream()
 				.map(agitMemberProfileEntityMapper::toDomain)
 				.toList();

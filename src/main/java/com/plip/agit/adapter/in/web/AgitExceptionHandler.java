@@ -12,6 +12,8 @@ import com.plip.agit.application.exception.CannotMuteSelfException;
 import com.plip.agit.application.exception.CapacityBelowCurrentException;
 import com.plip.agit.application.exception.HostCannotLeaveException;
 import com.plip.agit.application.exception.InvalidInviteCodeException;
+import com.plip.agit.application.exception.JoinRequestAlreadyPendingException;
+import com.plip.agit.application.exception.JoinRequestNotPendingException;
 import com.plip.agit.application.exception.InvalidTransferTargetException;
 import com.plip.agit.application.exception.NotAgitHostException;
 import org.springframework.http.HttpStatus;
@@ -72,6 +74,25 @@ public class AgitExceptionHandler {
 	public ErrorResponse handleNotAgitHost(NotAgitHostException ex) {
 		return ErrorResponse.builder()
 				.code("NOT_HOST")
+				.message(ex.getMessage())
+				.build();
+	}
+
+	@ExceptionHandler(JoinRequestAlreadyPendingException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ErrorResponse handleJoinRequestAlreadyPending(JoinRequestAlreadyPendingException ex) {
+		return ErrorResponse.builder()
+				.code("JOIN_REQUEST_PENDING")
+				.message(ex.getMessage())
+				.ampId(ex.getAmpId())
+				.build();
+	}
+
+	@ExceptionHandler(JoinRequestNotPendingException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ErrorResponse handleJoinRequestNotPending(JoinRequestNotPendingException ex) {
+		return ErrorResponse.builder()
+				.code("JOIN_REQUEST_NOT_PENDING")
 				.message(ex.getMessage())
 				.build();
 	}

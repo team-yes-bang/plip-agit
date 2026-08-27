@@ -2,6 +2,8 @@ package com.plip.agit.adapter.in.web;
 
 import com.plip.agit.adapter.in.web.dto.AgitDetailResponse;
 import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
+import com.plip.agit.adapter.in.web.dto.AgitPreviewResponse;
+import com.plip.agit.adapter.in.web.dto.JoinRequestItemResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
 import com.plip.agit.adapter.in.web.dto.JoinAgitRequest;
@@ -16,6 +18,7 @@ import com.plip.agit.adapter.in.web.mapper.AgitWebMapper;
 import com.plip.agit.application.port.in.AgitUseCase;
 import com.plip.agit.application.port.in.dto.AgitDetailResultDto;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
+import com.plip.agit.application.port.in.dto.AgitPreviewResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
@@ -73,6 +76,55 @@ public class AgitController {
 	public List<MyAgitItemResponse> listMyAgits() {
 		List<MyAgitItemDto> resultDtos = agitUseCase.listMyAgits(AuthenticatedActor.requireUserUuid());
 		return agitWebMapper.toMyAgitResponses(resultDtos);
+	}
+
+	@Operation(summary = "아지트 미리보기", description = "비멤버도 이름·소개·인원을 볼 수 있습니다. 초대코드는 포함하지 않습니다.")
+	@GetMapping("/{agitUuid}/preview")
+	public AgitPreviewResponse getPreview(@PathVariable UUID agitUuid) {
+		AgitPreviewResultDto resultDto =
+				agitUseCase.getPreview(agitUuid, AuthenticatedActor.requireUserUuid());
+		return agitWebMapper.toPreviewResponse(resultDto);
+	}
+
+	@Operation(summary = "입장 요청", description = "검색을 통해 PENDING 입장 요청을 올립니다. 즉시 입장하지 않습니다.")
+	@PostMapping("/{agitUuid}/join-requests")
+	@ResponseStatus(HttpStatus.CREATED)
+	public JoinAgitResponse requestJoin(
+			@PathVariable UUID agitUuid,
+			@RequestBody JoinAgitRequest request
+	) {
+		JoinAgitRequestDto requestDto = agitWebMapper.toJoinDto(request, AuthenticatedActor.requireUserUuid());
+		JoinAgitResultDto resultDto = agitUseCase.requestJoin(agitUuid, requestDto);
+		return agitWebMapper.toJoinResponse(resultDto);
+	}
+
+	@Operation(summary = "입장 요청 목록", description = "아지트장만 대기 중인 입장 요청을 조회합니다.")
+	@GetMapping("/{agitUuid}/join-requests")
+	public List<JoinRequestItemResponse> listJoinRequests(@PathVariable UUID agitUuid) {
+		return agitWebMapper.toJoinRequestResponses(
+				agitUseCase.listJoinRequests(agitUuid, AuthenticatedActor.requireUserUuid())
+		);
+	}
+
+	@Operation(summary = "입장 요청 수락")
+	@PostMapping("/{agitUuid}/join-requests/{ampId}/approve")
+	public JoinAgitResponse approveJoinRequest(
+			@PathVariable UUID agitUuid,
+			@PathVariable Long ampId
+	) {
+		return agitWebMapper.toJoinResponse(
+				agitUseCase.approveJoinRequest(agitUuid, ampId, AuthenticatedActor.requireUserUuid())
+		);
+	}
+
+	@Operation(summary = "입장 요청 거절")
+	@PostMapping("/{agitUuid}/join-requests/{ampId}/reject")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void rejectJoinRequest(
+			@PathVariable UUID agitUuid,
+			@PathVariable Long ampId
+	) {
+		agitUseCase.rejectJoinRequest(agitUuid, ampId, AuthenticatedActor.requireUserUuid());
 	}
 
 	@Operation(
