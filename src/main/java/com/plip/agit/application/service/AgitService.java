@@ -407,9 +407,12 @@ public class AgitService implements AgitUseCase {
 
 		Map<String, Object> payload = new LinkedHashMap<>();
 		payload.put("agitUuid", agit.getAgitUuid().toString());
+		payload.put("agitName", agit.getAgitName());
 		payload.put("userUuid", savedProfile.getUserUuid().toString());
 		payload.put("nickname", savedProfile.getNickname());
 		payload.put("ampId", savedProfile.getId());
+		agitMemberProfilePersistencePort.findActiveHostByAgitId(agit.getId())
+				.ifPresent(host -> payload.put("hostUserUuid", host.getUserUuid().toString()));
 		publishEvent(AgitEventTopics.JOIN_REQUESTED, agit.getAgitUuid(), payload);
 
 		return JoinAgitResultDto.builder()
