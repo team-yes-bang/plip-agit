@@ -4,8 +4,10 @@ import com.plip.agit.application.port.in.dto.AgitDetailResultDto;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
+import com.plip.agit.application.port.in.dto.AgitPreviewResultDto;
 import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
 import com.plip.agit.application.port.in.dto.JoinAgitResultDto;
+import com.plip.agit.application.port.in.dto.JoinRequestItemDto;
 import com.plip.agit.application.port.in.dto.MyAgitItemDto;
 import com.plip.agit.application.port.in.dto.ReissueInviteCodeResultDto;
 import com.plip.agit.application.port.in.dto.UpdateAgitRequestDto;
@@ -24,6 +26,16 @@ public interface AgitUseCase {
 	AgitDetailResultDto getAgit(UUID agitUuid, UUID actorUserUuid);
 
 	JoinAgitResultDto joinAgit(String code, JoinAgitRequestDto requestDto);
+
+	AgitPreviewResultDto getPreview(UUID agitUuid, UUID actorUserUuid);
+
+	JoinAgitResultDto requestJoin(UUID agitUuid, JoinAgitRequestDto requestDto);
+
+	List<JoinRequestItemDto> listJoinRequests(UUID agitUuid, UUID actorUserUuid);
+
+	JoinAgitResultDto approveJoinRequest(UUID agitUuid, Long ampId, UUID actorUserUuid);
+
+	void rejectJoinRequest(UUID agitUuid, Long ampId, UUID actorUserUuid);
 
 	void banMember(UUID agitUuid, Long ampId, UUID actorUserUuid);
 

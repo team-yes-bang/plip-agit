@@ -22,7 +22,7 @@ CREATE TABLE agit_member_profiles (
     user_uuid            BINARY(16)   NOT NULL COMMENT 'UUIDv7',
     nickname             VARCHAR(100) NOT NULL,
     profile_image_path   VARCHAR(255) NULL,
-    status               VARCHAR(20)  NOT NULL COMMENT 'ACTIVE, LEFT, BANNED',
+    status               VARCHAR(20)  NOT NULL COMMENT 'ACTIVE, PENDING, LEFT, BANNED',
     role                 VARCHAR(20)  NOT NULL COMMENT 'HOST, GUEST',
     apply_items          JSON         NULL COMMENT 'json으로 아이템 key 보유',
     created_at           DATETIME     NOT NULL,

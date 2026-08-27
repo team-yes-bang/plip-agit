@@ -4,6 +4,7 @@ public final class AgitEventTopics {
 
 	public static final String CREATED = "agit.created";
 	public static final String MEMBER_JOINED = "agit.member-joined";
+	public static final String JOIN_REQUESTED = "agit.join-requested";
 	public static final String MEMBER_LEFT = "agit.member-left";
 	public static final String DELETED = "agit.deleted";
 	public static final String MEMBER_BANNED = "agit.member-banned";

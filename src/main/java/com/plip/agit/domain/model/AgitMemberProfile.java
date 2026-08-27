@@ -73,6 +73,30 @@ public class AgitMemberProfile {
 				.build();
 	}
 
+	public static AgitMemberProfile createPendingGuest(
+			Long agitId,
+			UUID userUuid,
+			String nickname,
+			String profileImagePath
+	) {
+		if (agitId == null) {
+			throw new IllegalArgumentException("아지트 ID는 필수입니다.");
+		}
+		if (userUuid == null) {
+			throw new IllegalArgumentException("사용자 UUID는 필수입니다.");
+		}
+
+		return AgitMemberProfile.builder()
+				.agitId(agitId)
+				.userUuid(userUuid)
+				.nickname(requireNickname(nickname))
+				.profileImagePath(normalizeProfileImagePath(profileImagePath))
+				.status(AgitMemberStatus.PENDING)
+				.role(AgitMemberRole.GUEST)
+				.applyItems(null)
+				.build();
+	}
+
 	public static AgitMemberProfile reconstitute(
 			Long id,
 			Long agitId,
@@ -138,6 +162,29 @@ public class AgitMemberProfile {
 		this.nickname = requireNickname(nickname);
 		this.profileImagePath = normalizeProfileImagePath(profileImagePath);
 		this.status = AgitMemberStatus.ACTIVE;
+	}
+
+	public void requestJoin(String nickname, String profileImagePath) {
+		if (this.status != AgitMemberStatus.LEFT) {
+			throw new IllegalStateException("LEFT 상태가 아닌 멤버는 입장 요청할 수 없습니다.");
+		}
+		this.nickname = requireNickname(nickname);
+		this.profileImagePath = normalizeProfileImagePath(profileImagePath);
+		this.status = AgitMemberStatus.PENDING;
+	}
+
+	public void approveJoin() {
+		if (this.status != AgitMemberStatus.PENDING) {
+			throw new IllegalStateException("PENDING 상태가 아닌 멤버는 수락할 수 없습니다.");
+		}
+		this.status = AgitMemberStatus.ACTIVE;
+	}
+
+	public void rejectJoin() {
+		if (this.status != AgitMemberStatus.PENDING) {
+			throw new IllegalStateException("PENDING 상태가 아닌 멤버는 거절할 수 없습니다.");
+		}
+		this.status = AgitMemberStatus.LEFT;
 	}
 
 	/**

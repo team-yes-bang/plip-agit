@@ -8,6 +8,8 @@ import com.plip.agit.application.exception.AgitCapacityExceededException;
 import com.plip.agit.application.exception.AgitMemberNotActiveException;
 import com.plip.agit.application.exception.AgitMemberNotFoundException;
 import com.plip.agit.application.exception.AgitNotFoundException;
+import com.plip.agit.application.exception.JoinRequestAlreadyPendingException;
+import com.plip.agit.application.exception.JoinRequestNotPendingException;
 import com.plip.agit.application.exception.CannotBanHostException;
 import com.plip.agit.application.exception.CapacityBelowCurrentException;
 import com.plip.agit.application.exception.HostCannotLeaveException;
@@ -18,10 +20,12 @@ import com.plip.agit.application.port.in.AgitUseCase;
 import com.plip.agit.application.port.in.RefreshAgitReadModelUseCase;
 import com.plip.agit.application.port.in.dto.AgitDetailResultDto;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
+import com.plip.agit.application.port.in.dto.AgitPreviewResultDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
 import com.plip.agit.application.port.in.dto.JoinAgitResultDto;
+import com.plip.agit.application.port.in.dto.JoinRequestItemDto;
 import com.plip.agit.application.port.in.dto.MyAgitItemDto;
 import com.plip.agit.application.port.in.dto.ReissueInviteCodeResultDto;
 import com.plip.agit.application.port.in.dto.UpdateAgitRequestDto;
@@ -313,7 +317,12 @@ public class AgitService implements AgitUseCase {
 			savedProfile = agitMemberProfilePersistencePort.save(guest);
 		} else {
 			AgitMemberProfile profile = existingProfile.get();
-			profile.rejoin(requestDto.getNickname(), requestDto.getProfileImagePath());
+			if (profile.getStatus() == AgitMemberStatus.PENDING) {
+				profile.approveJoin();
+				profile.updateProfile(requestDto.getNickname(), requestDto.getProfileImagePath());
+			} else {
+				profile.rejoin(requestDto.getNickname(), requestDto.getProfileImagePath());
+			}
 			savedProfile = agitMemberProfilePersistencePort.save(profile);
 		}
 
@@ -334,6 +343,164 @@ public class AgitService implements AgitUseCase {
 				.profileImagePath(savedProfile.getProfileImagePath())
 				.role(savedProfile.getRole())
 				.build();
+	}
+
+	@Override
+	public AgitPreviewResultDto getPreview(UUID agitUuid, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+		Agit agit = requireActiveAgit(agitUuid);
+		AgitMemberProfile host = agitMemberProfilePersistencePort
+				.findActiveHostByAgitId(agit.getId())
+				.orElseThrow(AgitNotFoundException::new);
+		String myStatus = agitMemberProfilePersistencePort
+				.findByAgitIdAndUserUuid(agit.getId(), actorUserUuid)
+				.map(profile -> profile.getStatus().name())
+				.orElse(null);
+		return AgitPreviewResultDto.builder()
+				.agitUuid(agit.getAgitUuid())
+				.agitName(agit.getAgitName())
+				.description(agit.getDescription())
+				.currentMemberCount(agitMemberProfilePersistencePort.countActiveByAgitId(agit.getId()))
+				.maximumCapacity(agit.getMaximumCapacity())
+				.hostNickname(host.getNickname())
+				.thumbnailPath(agit.getThumbnailPath())
+				.myStatus(myStatus)
+				.build();
+	}
+
+	@Override
+	@Transactional
+	public JoinAgitResultDto requestJoin(UUID agitUuid, JoinAgitRequestDto requestDto) {
+		requireActorUserUuid(requestDto.getUserUuid());
+		Agit agit = requireActiveAgit(agitUuid);
+		var existingProfile = agitMemberProfilePersistencePort
+				.findByAgitIdAndUserUuid(agit.getId(), requestDto.getUserUuid());
+
+		if (existingProfile.isPresent()) {
+			AgitMemberProfile profile = existingProfile.get();
+			if (profile.getStatus() == AgitMemberStatus.BANNED) {
+				throw new AgitBannedException();
+			}
+			if (profile.getStatus() == AgitMemberStatus.ACTIVE) {
+				throw new AgitAlreadyJoinedException(profile.getId());
+			}
+			if (profile.getStatus() == AgitMemberStatus.PENDING) {
+				throw new JoinRequestAlreadyPendingException(profile.getId());
+			}
+		}
+
+		AgitMemberProfile savedProfile;
+		if (existingProfile.isEmpty()) {
+			savedProfile = agitMemberProfilePersistencePort.save(
+					AgitMemberProfile.createPendingGuest(
+							agit.getId(),
+							requestDto.getUserUuid(),
+							requestDto.getNickname(),
+							requestDto.getProfileImagePath()
+					)
+			);
+		} else {
+			AgitMemberProfile profile = existingProfile.get();
+			profile.requestJoin(requestDto.getNickname(), requestDto.getProfileImagePath());
+			savedProfile = agitMemberProfilePersistencePort.save(profile);
+		}
+
+		Map<String, Object> payload = new LinkedHashMap<>();
+		payload.put("agitUuid", agit.getAgitUuid().toString());
+		payload.put("userUuid", savedProfile.getUserUuid().toString());
+		payload.put("nickname", savedProfile.getNickname());
+		payload.put("ampId", savedProfile.getId());
+		publishEvent(AgitEventTopics.JOIN_REQUESTED, agit.getAgitUuid(), payload);
+
+		return JoinAgitResultDto.builder()
+				.agitUuid(agit.getAgitUuid())
+				.ampId(savedProfile.getId())
+				.nickname(savedProfile.getNickname())
+				.profileImagePath(savedProfile.getProfileImagePath())
+				.role(savedProfile.getRole())
+				.build();
+	}
+
+	@Override
+	public List<JoinRequestItemDto> listJoinRequests(UUID agitUuid, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+		Agit agit = requireActiveAgit(agitUuid);
+		requireActiveHost(agit.getId(), actorUserUuid);
+		return agitMemberProfilePersistencePort
+				.findByAgitIdAndStatus(agit.getId(), AgitMemberStatus.PENDING)
+				.stream()
+				.map(profile -> JoinRequestItemDto.builder()
+						.ampId(profile.getId())
+						.userUuid(profile.getUserUuid())
+						.nickname(profile.getNickname())
+						.profileImagePath(profile.getProfileImagePath())
+						.build())
+				.toList();
+	}
+
+	@Override
+	@Transactional
+	public JoinAgitResultDto approveJoinRequest(UUID agitUuid, Long ampId, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+		if (ampId == null) {
+			throw new IllegalArgumentException("멤버 프로필 ID는 필수입니다.");
+		}
+		Agit agit = requireActiveAgit(agitUuid);
+		requireActiveHost(agit.getId(), actorUserUuid);
+		AgitMemberProfile target = agitMemberProfilePersistencePort.findById(ampId)
+				.orElseThrow(AgitMemberNotFoundException::new);
+		if (!agit.getId().equals(target.getAgitId())) {
+			throw new AgitMemberNotFoundException();
+		}
+		if (target.getStatus() != AgitMemberStatus.PENDING) {
+			throw new JoinRequestNotPendingException();
+		}
+		long currentMemberCount = agitMemberProfilePersistencePort.countActiveByAgitId(agit.getId());
+		if (currentMemberCount >= agit.getMaximumCapacity()) {
+			throw new AgitCapacityExceededException();
+		}
+		target.approveJoin();
+		AgitMemberProfile saved = agitMemberProfilePersistencePort.save(target);
+
+		Map<String, Object> joinPayload = new LinkedHashMap<>();
+		joinPayload.put("agitUuid", agit.getAgitUuid().toString());
+		joinPayload.put("userUuid", saved.getUserUuid().toString());
+		joinPayload.put("nickname", saved.getNickname());
+		joinPayload.put("profileImagePath", saved.getProfileImagePath());
+		joinPayload.put("role", saved.getRole().name());
+		publishEvent(AgitEventTopics.MEMBER_JOINED, agit.getAgitUuid(), joinPayload);
+		scheduleReadModelRefresh(agit.getAgitUuid());
+		scheduleMembershipPut(agit.getAgitUuid(), saved.getUserUuid(), saved.getRole());
+
+		return JoinAgitResultDto.builder()
+				.agitUuid(agit.getAgitUuid())
+				.ampId(saved.getId())
+				.nickname(saved.getNickname())
+				.profileImagePath(saved.getProfileImagePath())
+				.role(saved.getRole())
+				.build();
+	}
+
+	@Override
+	@Transactional
+	public void rejectJoinRequest(UUID agitUuid, Long ampId, UUID actorUserUuid) {
+		requireActorUserUuid(actorUserUuid);
+		if (ampId == null) {
+			throw new IllegalArgumentException("멤버 프로필 ID는 필수입니다.");
+		}
+		Agit agit = requireActiveAgit(agitUuid);
+		requireActiveHost(agit.getId(), actorUserUuid);
+		AgitMemberProfile target = agitMemberProfilePersistencePort.findById(ampId)
+				.orElseThrow(AgitMemberNotFoundException::new);
+		if (!agit.getId().equals(target.getAgitId())) {
+			throw new AgitMemberNotFoundException();
+		}
+		if (target.getStatus() != AgitMemberStatus.PENDING) {
+			throw new JoinRequestNotPendingException();
+		}
+		target.rejectJoin();
+		agitMemberProfilePersistencePort.save(target);
+		scheduleReadModelRefresh(agit.getAgitUuid());
 	}
 
 	/**

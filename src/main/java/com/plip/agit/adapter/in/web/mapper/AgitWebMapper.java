@@ -2,6 +2,8 @@ package com.plip.agit.adapter.in.web.mapper;
 
 import com.plip.agit.adapter.in.web.dto.AgitDetailResponse;
 import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
+import com.plip.agit.adapter.in.web.dto.AgitPreviewResponse;
+import com.plip.agit.adapter.in.web.dto.JoinRequestItemResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
 import com.plip.agit.adapter.in.web.dto.JoinAgitRequest;
@@ -14,6 +16,8 @@ import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileRequest;
 import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileResponse;
 import com.plip.agit.application.port.in.dto.AgitDetailResultDto;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
+import com.plip.agit.application.port.in.dto.AgitPreviewResultDto;
+import com.plip.agit.application.port.in.dto.JoinRequestItemDto;
 import com.plip.agit.application.port.in.dto.CreateAgitRequestDto;
 import com.plip.agit.application.port.in.dto.CreateAgitResultDto;
 import com.plip.agit.application.port.in.dto.JoinAgitRequestDto;
@@ -86,6 +90,30 @@ public class AgitWebMapper {
 								.build())
 						.toList())
 				.build();
+	}
+
+	public AgitPreviewResponse toPreviewResponse(AgitPreviewResultDto resultDto) {
+		return AgitPreviewResponse.builder()
+				.agitUuid(resultDto.getAgitUuid())
+				.agitName(resultDto.getAgitName())
+				.description(resultDto.getDescription())
+				.currentMemberCount(resultDto.getCurrentMemberCount())
+				.maximumCapacity(resultDto.getMaximumCapacity())
+				.hostNickname(resultDto.getHostNickname())
+				.thumbnailPath(resultDto.getThumbnailPath())
+				.myStatus(resultDto.getMyStatus())
+				.build();
+	}
+
+	public List<JoinRequestItemResponse> toJoinRequestResponses(List<JoinRequestItemDto> items) {
+		return items.stream()
+				.map(item -> JoinRequestItemResponse.builder()
+						.ampId(item.getAmpId())
+						.userUuid(item.getUserUuid())
+						.nickname(item.getNickname())
+						.profileImagePath(item.getProfileImagePath())
+						.build())
+				.toList();
 	}
 
 	public AgitLandingResponse toLandingResponse(AgitLandingResultDto resultDto) {
