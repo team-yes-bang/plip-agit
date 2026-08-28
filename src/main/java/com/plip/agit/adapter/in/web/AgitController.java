@@ -4,6 +4,7 @@ import com.plip.agit.adapter.in.web.dto.AgitDetailResponse;
 import com.plip.agit.adapter.in.web.dto.AgitLandingResponse;
 import com.plip.agit.adapter.in.web.dto.AgitPreviewResponse;
 import com.plip.agit.adapter.in.web.dto.JoinRequestItemResponse;
+import com.plip.agit.adapter.in.web.dto.AgitThumbnailUploadUrlResponse;
 import com.plip.agit.adapter.in.web.dto.CreateAgitRequest;
 import com.plip.agit.adapter.in.web.dto.CreateAgitResponse;
 import com.plip.agit.adapter.in.web.dto.JoinAgitRequest;
@@ -15,7 +16,9 @@ import com.plip.agit.adapter.in.web.dto.UpdateAgitResponse;
 import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileRequest;
 import com.plip.agit.adapter.in.web.dto.UpdateMyMemberProfileResponse;
 import com.plip.agit.adapter.in.web.mapper.AgitWebMapper;
+import com.plip.agit.application.port.in.AgitThumbnailUseCase;
 import com.plip.agit.application.port.in.AgitUseCase;
+import com.plip.agit.application.port.in.dto.AgitThumbnailUploadUrlResultDto;
 import com.plip.agit.application.port.in.dto.AgitDetailResultDto;
 import com.plip.agit.application.port.in.dto.AgitLandingResultDto;
 import com.plip.agit.application.port.in.dto.AgitPreviewResultDto;
@@ -42,6 +45,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,6 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AgitController {
 
 	private final AgitUseCase agitUseCase;
+	private final AgitThumbnailUseCase agitThumbnailUseCase;
 	private final AgitWebMapper agitWebMapper;
 
 	@Operation(
@@ -64,6 +69,62 @@ public class AgitController {
 		CreateAgitRequestDto requestDto = agitWebMapper.toDto(request, AuthenticatedActor.requireUserUuid());
 		CreateAgitResultDto resultDto = agitUseCase.createAgit(requestDto);
 		return agitWebMapper.toResponse(resultDto);
+	}
+
+	@Operation(
+			summary = "아지트 썸네일 Presigned upload URL 발급 (생성 전)",
+			description = """
+					아지트 생성 전 썸네일 이미지를 raw bucket에 PUT할 Presigned URL을 발급합니다.
+					- thumbnailPath = images/agit/{uploadKey}.jpg
+					- contentLengthBytes 필수 (최대 2MB)
+					- contentType은 image/jpeg
+					"""
+	)
+	@PostMapping("/thumbnail-upload-url")
+	@ResponseStatus(HttpStatus.CREATED)
+	public AgitThumbnailUploadUrlResponse issueThumbnailUploadUrl(
+			@RequestParam long contentLengthBytes,
+			@RequestParam(required = false) String contentType
+	) {
+		AuthenticatedActor.requireUserUuid();
+		AgitThumbnailUploadUrlResultDto resultDto =
+				agitThumbnailUseCase.issueUploadUrl(contentLengthBytes, contentType);
+		return toThumbnailUploadUrlResponse(resultDto);
+	}
+
+	@Operation(
+			summary = "아지트 썸네일 Presigned upload URL 발급 (수정)",
+			description = """
+					아지트장이 썸네일 이미지를 raw bucket에 PUT할 Presigned URL을 발급합니다.
+					- thumbnailPath = images/agit/{agitUuid}.jpg
+					- contentLengthBytes 필수 (최대 2MB)
+					"""
+	)
+	@PostMapping("/{agitUuid}/thumbnail-upload-url")
+	@ResponseStatus(HttpStatus.CREATED)
+	public AgitThumbnailUploadUrlResponse issueThumbnailUploadUrlForAgit(
+			@PathVariable UUID agitUuid,
+			@RequestParam long contentLengthBytes,
+			@RequestParam(required = false) String contentType
+	) {
+		AgitThumbnailUploadUrlResultDto resultDto = agitThumbnailUseCase.issueUploadUrlForAgit(
+				agitUuid,
+				AuthenticatedActor.requireUserUuid(),
+				contentLengthBytes,
+				contentType
+		);
+		return toThumbnailUploadUrlResponse(resultDto);
+	}
+
+	private static AgitThumbnailUploadUrlResponse toThumbnailUploadUrlResponse(
+			AgitThumbnailUploadUrlResultDto resultDto
+	) {
+		return new AgitThumbnailUploadUrlResponse(
+				resultDto.uploadKey(),
+				resultDto.thumbnailPath(),
+				resultDto.uploadUrl(),
+				resultDto.expiresAt()
+		);
 	}
 
 	@Operation(

@@ -26,6 +26,17 @@ agit:
   mongo:
     backfill: ${AGIT_MONGO_BACKFILL:false}
 
+plip:
+  aws:
+    enabled: ${AWS_ENABLED:false}
+    region: ${AWS_REGION:ap-northeast-2}
+    presigned-url-ttl-seconds: ${AWS_PRESIGNED_URL_TTL_SECONDS:10800}
+    s3:
+      raw-bucket: ${AWS_S3_RAW_BUCKET:}
+      image-prefix: images/
+      agit-thumbnail-prefix: agit/
+      cdn-base-url: ${AWS_CDN_BASE_URL:}
+
 eureka:
   instance:
     prefer-ip-address: true
